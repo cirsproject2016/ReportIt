@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.cirs.reportit.ui.activities.NewComplaintActivity">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/lnr_dummy"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentTop="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:orientation="horizontal" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:minHeight="@dimen/standard_field_height">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_complaint_category"
+                    android:inputType="none" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_title"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/standard_field_height"
+                android:layout_below="@id/til_category">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_complaint_title"
+                    android:inputType="textCapSentences"
+                    android:maxLength="20"
+                    android:maxLines="1" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_title"
+                android:minHeight="@dimen/standard_field_height">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_complaint_description"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLength="100" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_description"
+                android:minHeight="@dimen/standard_field_height">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_complaint_location"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLength="100" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_landmark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_location"
+                android:minHeight="@dimen/standard_field_height">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_landmark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_complaint_landmark"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLength="30" />
+            </android.support.design.widget.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/img_complaint"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:layout_below="@id/til_landmark"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/txt_remove"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_below="@id/img_complaint"
+                android:gravity="center"
+                android:text="@string/create_profile_remove_photo"
+                android:visibility="gone" />
+        </RelativeLayout>
+    </ScrollView>
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fam_add_pic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        fab:menu_colorNormal="@color/colorAccent"
+        fab:menu_icon="@drawable/ic_add_white_36dp">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_from_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_camera"
+            app:fab_size="mini"
+            fab:fab_colorNormal="@color/colorPrimary"
+            fab:fab_colorPressed="@color/colorPrimaryDark" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_from_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gallery"
+            app:fab_size="mini"
+            fab:fab_colorNormal="@color/colorPrimary"
+            fab:fab_colorPressed="@color/colorPrimaryDark" />
+    </com.github.clans.fab.FloatingActionMenu>
+
+</RelativeLayout>

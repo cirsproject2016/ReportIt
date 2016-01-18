@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.cirs.reportit.ui.activities.NewComplaintActivity">
+    <item
+        android:id="@+id/menu_item_submit"
+        android:icon="@drawable/ic_white_tick"
+        android:title="@string/create_profile_menu_item_title_submit"
+        app:showAsAction="always" />
+</menu>

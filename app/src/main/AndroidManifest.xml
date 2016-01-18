@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.kshitij.reportit">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="com.cirs.reportit.ui.activities.SplashActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.cirs.reportit.ui.activities.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.cirs.reportit.ui.activities.CreateProfileActivity"
+            android:label="@string/title_activity_create_profile"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.cirs.reportit.ui.activities.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.cirs.reportit.ui.activities.ViewProfileActivity"
+            android:label="@string/title_activity_view_profile"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.cirs.reportit.ui.activities.NewComplaintActivity"
+            android:label="@string/title_activity_new_complaint"
+            android:screenOrientation="portrait" />
+    </application>
+
+</manifest>

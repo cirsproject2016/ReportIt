@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/activity_horizontal_margin"
+    tools:context="com.cirs.reportit.ui.activities.CreateProfileActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_firstname"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/standard_field_height"
+                android:layout_alignParentTop="true">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_firstname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/create_profile_firstname"
+                    android:inputType="textPersonName|textCapWords" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_lastname"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/standard_field_height"
+                android:layout_below="@id/til_firstname">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_lastname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/create_profile_lastname"
+                    android:inputType="textPersonName|textCapWords" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_gender"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/standard_field_height"
+                android:layout_below="@id/til_lastname">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_gender"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/create_profile_gender"
+                    android:inputType="textPersonName|textCapWords" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_dob"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/standard_field_height"
+                android:layout_below="@id/til_gender">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_dob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/create_profile_dob"
+                    android:inputType="date" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_email"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/standard_field_height"
+                android:layout_below="@id/til_dob">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/create_profile_email"
+                    android:inputType="textEmailAddress" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_mobile"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/standard_field_height"
+                android:layout_below="@id/til_email">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edt_mobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/create_profile_mobile_no"
+                    android:inputType="phone"
+                    android:maxLength="10" />
+            </android.support.design.widget.TextInputLayout>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_profile_pic"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_below="@id/til_mobile"
+                android:layout_centerHorizontal="true"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_my_profile"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/txt_remove"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_below="@id/img_profile_pic"
+                android:layout_marginBottom="60dp"
+                android:gravity="center"
+                android:text="@string/create_profile_remove_photo"
+                android:visibility="gone" />
+        </RelativeLayout>
+    </ScrollView>
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fam_add_pic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        fab:menu_colorNormal="@color/colorAccent"
+        fab:menu_icon="@drawable/ic_my_profile_alt">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_from_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_camera"
+            app:fab_size="mini"
+            fab:fab_colorNormal="@color/colorPrimary"
+            fab:fab_colorPressed="@color/colorPrimaryDark" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_from_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gallery"
+            app:fab_size="mini"
+            fab:fab_colorNormal="@color/colorPrimary"
+            fab:fab_colorPressed="@color/colorPrimaryDark" />
+
+    </com.github.clans.fab.FloatingActionMenu>
+</RelativeLayout>

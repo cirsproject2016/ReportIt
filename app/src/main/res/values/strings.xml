@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">ReportIt!</string>
+
+    <!--Activity Titles-->
+    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_home">Complaints</string>
+    <string name="title_activity_create_profile">Create Profile</string>
+    <string name="title_activity_view_profile">My Profile</string>
+    <string name="title_activity_new_complaint">New Complaint</string>
+
+    <!--Login Activity-->
+    <string name="login_username">Username</string>
+    <string name="login_password">Password</string>
+    <string name="login_login">LOGIN</string>
+
+    <!--Home Activity-->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="home_tab_recent">Recent</string>
+    <string name="home_tab_my_reports">My Reports</string>
+    <string name="home_tab_bookmarked">Bookmarked</string>
+    <string name="nav_new_complaint">New Complaint</string>
+    <string name="nav_my_profile">My Profile</string>
+    <string name="nav_logout">Logout</string>
+
+    <!--Create Profile Activity-->
+    <string name="create_profile_menu_item_title_submit">Submit</string>
+    <string name="create_profile_firstname">First Name</string>
+    <string name="create_profile_lastname">Last Name</string>
+    <string name="create_profile_gender">Gender</string>
+    <string name="create_profile_dob">Date of Birth</string>
+    <string name="create_profile_email">Email ID</string>
+    <string name="create_profile_mobile_no">Mobile No (10-digit)</string>
+    <string name="create_profile_picture">Profile Picture</string>
+    <string name="create_profile_remove_photo">Remove photo</string>
+    <string name="create_profile_fam_label">Select Profile Picture</string>
+    <string name="create_profile_fab_camera_label">Select from Camera</string>
+    <string name="create_profile_fab_gallery_label">Select from Gallery</string>
+
+    <!--View Profile Activity-->
+    <string name="view_profile_menu_item_title_confirm">Confirm</string>
+    <string name="view_profile_menu_item_title_edit">Edit</string>
+    <string name="view_profile_alt_title_edit_profile">Edit Profile</string>
+
+    <!--New Complaint Activity-->
+    <string name="new_complaint_category">Category</string>
+    <string name="new_complaint_title">Title</string>
+    <string name="new_complaint_description">Description</string>
+    <string name="new_complaint_location">Location</string>
+    <string name="new_complaint_landmark">Landmark</string>
+    <string name="new_complaint_fam_label">Add Picture</string>
+    <string name="new_complaint_fab_camera_label">Select from Camera</string>
+    <string name="new_complaint_fab_gallery_label">Select from Gallery</string>
+
+</resources>

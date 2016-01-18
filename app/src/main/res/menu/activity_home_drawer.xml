@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/title_activity_home">
+        <menu>
+            <item
+                android:id="@+id/nav_recent"
+                android:icon="@drawable/ic_recent"
+                android:title="@string/home_tab_recent" />
+            <item
+                android:id="@+id/nav_my_reports"
+                android:icon="@drawable/ic_my_reports"
+                android:title="@string/home_tab_my_reports" />
+            <item
+                android:id="@+id/nav_bookmarked"
+                android:icon="@drawable/ic_bookmark"
+                android:title="@string/home_tab_bookmarked" />
+        </menu>
+    </item>
+
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_new_complaint"
+            android:icon="@drawable/ic_new_complaint"
+            android:title="@string/nav_new_complaint" />
+        <item
+            android:id="@+id/nav_my_profile"
+            android:icon="@drawable/ic_my_profile"
+            android:title="@string/nav_my_profile" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_logout"
+            android:title="@string/nav_logout" />
+    </group>
+
+</menu>
