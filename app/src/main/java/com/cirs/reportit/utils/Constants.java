@@ -25,7 +25,7 @@ public final class Constants {
     public static final String SPUD_PHONE = "phone";
 
     //Splash Screen Activity Constants
-    public static final int SPLASH_SCREEN_TIMEOUT = 2000;
+    public static final int SPLASH_SCREEN_TIMEOUT = 3000;
 
     //Create Profile Activity Constants
     public static final String REGEX_PHONE = "^[789]\\d{9}$";
