@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,15 +23,28 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
+import com.cirs.R;
+import com.cirs.entities.CIRSUser;
+import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
-import com.example.kshitij.reportit.R;
+import com.cirs.reportit.utils.Generator;
+import com.cirs.reportit.utils.VolleyImageRequest;
+import com.cirs.reportit.utils.VolleyRequest;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -66,7 +81,7 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     private Validator validator;
 
-    private Context context = this;
+    private Context mActivityContext = this;
 
     private FloatingActionMenu floatingActionMenu;
 
@@ -74,7 +89,7 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     private FloatingActionButton fabGallery;
 
-    private CircleImageView imgProfile;
+    private NetworkImageView imgProfile;
 
     private TextView txtRemove;
 
@@ -88,19 +103,25 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     private AlertDialog.Builder gendersDialog;
 
+    private ReportItApplication mAppContext;
+
+    private Bitmap bmpProfilePic;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_profile);
 
-        validator = new Validator(context);
+        mAppContext = (ReportItApplication) getApplicationContext();
+
+        validator = new Validator(mActivityContext);
         pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
 
         initializeViews();
         setDatePicker();
         setListeners();
         createGendersDialog();
-        setAndSaveImage(BitmapFactory.decodeResource(getResources(), R.drawable.ic_my_profile));
+        //setAndSaveImage(BitmapFactory.decodeResource(getResources(), R.drawable.ic_my_profile));
     }
 
     @Override
@@ -125,10 +146,62 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     @Override
     public void onValidationSucceeded() {
-        saveToSharedPref();
-        Toast.makeText(context, "Profile Created!", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(CreateProfileActivity.this, HomeActivity.class));
-        finish();
+        CIRSUser user;
+        user = mAppContext.getCirsUser();
+        user.setFirstName(edtFirstname.getText().toString().trim());
+        user.setLastName(edtLastname.getText().toString().trim());
+        user.setGender(edtGender.getText().toString().trim());
+        user.setDob(edtDOB.getText().toString().trim());
+        user.setEmail(edtEmail.getText().toString().trim());
+        user.setPhone(edtPhone.getText().toString().trim());
+
+        if (isImageSet) {
+            bmpProfilePic = ((BitmapDrawable) imgProfile.getDrawable()).getBitmap();
+            setAndSaveImage(bmpProfilePic);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bmpProfilePic.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            new VolleyRequest<byte[]>(mActivityContext).makeImageRequest(
+                    Generator.getURLtoUploadProfilePic(user),
+                    "put",
+                    VolleyRequest.FileType.PNG,
+                    byteArray,
+                    new Response.Listener<Integer>() {
+                        @Override
+                        public void onResponse(Integer response) {
+                            System.out.println("Response: " + response);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            System.out.println("Error: " + error);
+                        }
+                    }
+            );
+        }
+
+        new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
+                Request.Method.PUT,
+                Generator.getURLtoEditUser(user),
+                user,
+                new Response.Listener<CIRSUser>() {
+                    @Override
+                    public void onResponse(CIRSUser response) {
+                        saveToSharedPref();
+                        Toast.makeText(mActivityContext, "Profile Created!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(CreateProfileActivity.this, HomeActivity.class));
+                        finish();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                },
+                CIRSUser.class
+        );
     }
 
     @Override
@@ -146,23 +219,29 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Bitmap bitmap = null;
         if (resultCode == RESULT_OK) {
-            imgProfile.setVisibility(View.VISIBLE);
-            txtRemove.setVisibility(View.VISIBLE);
-            floatingActionMenu.setVisibility(View.GONE);
             if (requestCode == 100) {
-                bitmap = (Bitmap) data.getExtras().get("data");
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator
+                        + Constants.FILE_PATH_PROFILE_PIC);
+                cropCapturedImage(Uri.fromFile(file));
             } else if (requestCode == 200) {
                 Uri uri = data.getData();
                 try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    bmpProfilePic = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    File file = new File(Environment.getExternalStorageDirectory() + File.separator
+                            + Constants.FILE_PATH_PROFILE_PIC);
+                    OutputStream outputStream = new FileOutputStream(file);
+                    bmpProfilePic.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.flush();
+                    outputStream.close();
+                    cropCapturedImage(Uri.fromFile(file));
                 } catch (Exception e) {
                 }
-            }
-            if (bitmap != null) {
-                setAndSaveImage(bitmap);
+            } else if (requestCode == 300) {
+                Bundle extras = data.getExtras();
+                bmpProfilePic = extras.getParcelable("data");
                 isImageSet = true;
+                setAndSaveImage(bmpProfilePic);
             }
         }
     }
@@ -177,8 +256,32 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
         floatingActionMenu = (FloatingActionMenu) findViewById(R.id.fam_add_pic);
         fabCamera = (FloatingActionButton) findViewById(R.id.fab_from_camera);
         fabGallery = (FloatingActionButton) findViewById(R.id.fab_from_gallery);
-        imgProfile = (CircleImageView) findViewById(R.id.img_profile_pic);
+        imgProfile = (NetworkImageView) findViewById(R.id.img_profile_pic);
         txtRemove = (TextView) findViewById(R.id.txt_remove);
+
+        CIRSUser user = mAppContext.getCirsUser();
+        edtFirstname.setText(user.getFirstName());
+        edtLastname.setText(user.getLastName());
+        edtGender.setText(user.getGender());
+        edtDOB.setText(user.getDob());
+        edtEmail.setText(user.getEmail());
+        edtPhone.setText(user.getPhone());
+
+        isImageSet = true;
+        imgProfile.setVisibility(View.VISIBLE);
+        txtRemove.setVisibility(View.VISIBLE);
+        floatingActionMenu.setVisibility(View.GONE);
+
+        getProfilePicFromServer(user.getId());
+
+    }
+
+    private void getProfilePicFromServer(Long id) {
+        String URL = Generator.getURLtoGetUserImage(id);
+        ImageLoader imageLoader = VolleyImageRequest.getInstance(mActivityContext).getImageLoader();
+        imageLoader.get(URL, ImageLoader.getImageListener(
+                imgProfile, R.drawable.ic_my_profile, android.R.drawable.ic_dialog_alert));
+        imgProfile.setImageUrl(URL, imageLoader);
     }
 
     private void setDatePicker() {
@@ -232,7 +335,10 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
         fabCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator
+                        + Constants.FILE_PATH_PROFILE_PIC);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
                 startActivityForResult(intent, 100);
             }
         });
@@ -263,9 +369,14 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     private void setAndSaveImage(Bitmap bitmap) {
         try {
+            if (isImageSet) {
+                imgProfile.setVisibility(View.VISIBLE);
+                txtRemove.setVisibility(View.VISIBLE);
+                floatingActionMenu.setVisibility(View.GONE);
+            }
             imgProfile.setImageBitmap(bitmap);
             FileOutputStream out;
-            out = context.openFileOutput(Constants.FILE_PATH_PROFILE_PIC, Context.MODE_PRIVATE);
+            out = mActivityContext.openFileOutput(Constants.FILE_PATH_PROFILE_PIC, Context.MODE_PRIVATE);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.close();
         } catch (Exception e) {
@@ -274,7 +385,7 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     private void createGendersDialog() {
         gendersDialog = new AlertDialog.Builder(this);
-        final ArrayList<String> gendersList = new ArrayList<String>(Arrays.asList("Male", "Female"));
+        final ArrayList<String> gendersList = new ArrayList<String>(Arrays.asList("MALE", "FEMALE"));
         ArrayAdapter<String> gendersAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, gendersList);
         gendersDialog.setTitle("Select Gender").setSingleChoiceItems(gendersAdapter, -1, new DialogInterface.OnClickListener() {
             @Override
@@ -301,5 +412,17 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
         editor.putBoolean(Constants.SPUD_IS_IMAGE_SET, isImageSet);
         editor.putBoolean(Constants.SPUD_IS_PROFILE_CREATED, true);
         editor.commit();
+    }
+
+    private void cropCapturedImage(Uri picUri) {
+        Intent cropIntent = new Intent("com.android.camera.action.CROP");
+        cropIntent.setDataAndType(picUri, "image/*");
+        cropIntent.putExtra("crop", "true");
+        cropIntent.putExtra("aspectX", 1);
+        cropIntent.putExtra("aspectY", 1);
+        cropIntent.putExtra("outputX", 500);
+        cropIntent.putExtra("outputY", 500);
+        cropIntent.putExtra("return-data", true);
+        startActivityForResult(cropIntent, 300);
     }
 }

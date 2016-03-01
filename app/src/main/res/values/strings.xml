@@ -51,5 +51,17 @@
     <string name="new_complaint_fam_label">Add Picture</string>
     <string name="new_complaint_fab_camera_label">Select from Camera</string>
     <string name="new_complaint_fab_gallery_label">Select from Gallery</string>
+    <string name="title_activity_view_complaint">Complaint</string>
+
+    <!--View Complaint Activity-->
+    <string name="view_complaint_status">Status</string>
+    <string name="view_complaint_category">Category</string>
+    <string name="view_complaint_complainant">Complainant</string>
+    <string name="view_complaint_description">Description</string>
+    <string name="view_complaint_location">Location</string>
+    <string name="view_complaint_landmark">Landmark</string>
+    <string name="view_complaint_admin_remarks">Admin Remarks</string>
+    <string name="view_complaint_upvotes">Upvotes</string>
+    <string name="view_complaint_comments">Comments</string>
 
 </resources>

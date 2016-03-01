@@ -10,8 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.cirs.R;
+import com.cirs.entities.CIRSUser;
+import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
-import com.example.kshitij.reportit.R;
+import com.cirs.reportit.utils.VolleyRequest;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,16 +31,22 @@ public class LoginActivity extends AppCompatActivity {
 
     private SharedPreferences.Editor editor;
 
-    private Context context = this;
+    private Context mActivityContext = this;
 
     private String username;
 
     private String password;
 
+    private Long adminId;
+
+    private ReportItApplication mAppContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        mAppContext = (ReportItApplication) getApplicationContext();
 
         initializeViews();
 
@@ -43,18 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                username = edtUsername.getText().toString();
-                password = edtPassword.getText().toString();
-                if (username.equals("user1") && password.equals("1234")) {
-                    saveToSharedPref();
-                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(LoginActivity.this, CreateProfileActivity.class));
-                    finish();
-                } else {
-                    edtUsername.setText("");
-                    edtPassword.setText("");
-                    Toast.makeText(context, "Invalid username and password!", Toast.LENGTH_LONG).show();
-                }
+                validateCredentials();
             }
         });
     }
@@ -67,8 +68,68 @@ public class LoginActivity extends AppCompatActivity {
 
     private void saveToSharedPref() {
         editor = pref.edit();
+        editor.putLong(Constants.SPUD_ADMIN_ID, adminId);
         editor.putString(Constants.SPUD_USERNAME, username);
         editor.putBoolean(Constants.SPUD_IS_SIGNED_IN, true);
         editor.commit();
+    }
+
+    private void validateCredentials() {
+        username = edtUsername.getText().toString().trim();
+        password = edtPassword.getText().toString().trim();
+        UserCred obj = new UserCred();
+        obj.userName = username;
+        obj.password = password;
+        new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
+                Request.Method.POST,
+                Constants.BASE_URI + "/user",
+                obj,
+                new Response.Listener<CIRSUser>() {
+                    @Override
+                    public void onResponse(CIRSUser response) {
+                        adminId = response.getAdmin().getId();
+                        mAppContext.setCirsUser(response);
+                        saveToSharedPref();
+                        Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                        if (!pref.getBoolean(Constants.SPUD_IS_PROFILE_CREATED, false)) {
+                            startActivity(new Intent(LoginActivity.this, CreateProfileActivity.class));
+                        } else {
+                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                        }
+                        finish();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        edtUsername.setText("");
+                        edtPassword.setText("");
+                        System.out.println(error.toString());
+                        Toast.makeText(mActivityContext, "Invalid userName and password!", Toast.LENGTH_LONG).show();
+                    }
+                },
+                CIRSUser.class);
+    }
+
+    private class UserCred {
+        String userName;
+        String password;
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public void setUserName(String userName) {
+            this.userName = userName;
+        }
+
+        public String getPassword() {
+
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 }

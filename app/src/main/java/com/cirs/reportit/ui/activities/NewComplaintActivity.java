@@ -5,8 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,13 +20,27 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.kshitij.reportit.R;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.cirs.R;
+import com.cirs.entities.Category;
+import com.cirs.entities.Complaint;
+import com.cirs.reportit.ReportItApplication;
+import com.cirs.reportit.utils.Constants;
+import com.cirs.reportit.utils.Generator;
+import com.cirs.reportit.utils.VolleyRequest;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +64,7 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
 
     private AlertDialog.Builder categoriesDialog;
 
-    private Context context = this;
+    private Context mActivityContext = this;
 
     private FloatingActionMenu floatingActionMenu;
 
@@ -68,12 +82,19 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
 
     private boolean isComplaintComplete = false;
 
+    private ReportItApplication mAppContext;
+
+    private Category selectedcategory;
+
+    private Bitmap bmpComplaintPic;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_complaint);
+        mAppContext = (ReportItApplication) getApplicationContext();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        validator = new Validator(context);
+        validator = new Validator(mActivityContext);
         initializeViews();
         linearLayout.requestFocus();
         createCategoriesDialog();
@@ -92,7 +113,12 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
                 onBackPressed();
                 return true;
             case R.id.menu_item_submit:
-                validator.validate();
+                if (isImageSet()) {
+                    validator.validate();
+                } else {
+                    Toast.makeText(mActivityContext, "Please select an image for your complaint!",
+                            Toast.LENGTH_SHORT).show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -104,7 +130,7 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
         if (isComplaintComplete || areAllViewsEmpty()) {
             super.onBackPressed();
         } else {
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(mActivityContext);
             alertDialog.setTitle("Alert!")
                     .setMessage("Any details entered will not be saved. " +
                             "Are you sure you want to go back?")
@@ -140,12 +166,13 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
 
     private void createCategoriesDialog() {
         categoriesDialog = new AlertDialog.Builder(this);
-        final ArrayList<String> categoriesList = new ArrayList<String>(Arrays.asList("Cat1", "Cat2", "Cat3"));
-        ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, categoriesList);
+        final ArrayList<Category> categoriesList = new ArrayList<>(mAppContext.getCategories());
+        ArrayAdapter<Category> categoriesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, categoriesList);
         categoriesDialog.setTitle("Select Category").setSingleChoiceItems(categoriesAdapter, -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                edtCategory.setText(categoriesList.get(i));
+                edtCategory.setText(categoriesList.get(i).toString());
+                selectedcategory = categoriesList.get(i);
                 dialogInterface.dismiss();
             }
         }).setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -174,7 +201,10 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
         fabCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator
+                        + Constants.FILE_PATH_COMPLAINT_PIC);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
                 startActivityForResult(intent, 100);
             }
         });
@@ -192,11 +222,7 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
         txtRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isImageSet = false;
-                floatingActionMenu.close(false);
-                imgComplaint.setVisibility(View.GONE);
-                txtRemove.setVisibility(View.GONE);
-                floatingActionMenu.setVisibility(View.VISIBLE);
+                setIsImageSet(false);
             }
         });
 
@@ -206,29 +232,85 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            isImageSet = true;
-            imgComplaint.setVisibility(View.VISIBLE);
-            txtRemove.setVisibility(View.VISIBLE);
-            floatingActionMenu.setVisibility(View.GONE);
+            setIsImageSet(true);
             if (requestCode == 100) {
-                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                imgComplaint.setImageBitmap(bitmap);
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator
+                        + Constants.FILE_PATH_COMPLAINT_PIC);
+                cropCapturedImage(Uri.fromFile(file));
             } else if (requestCode == 200) {
                 Uri uri = data.getData();
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                    imgComplaint.setImageBitmap(bitmap);
+                    File file = new File(Environment.getExternalStorageDirectory() + File.separator
+                            + Constants.FILE_PATH_COMPLAINT_PIC);
+                    OutputStream outputStream = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.flush();
+                    outputStream.close();
+                    cropCapturedImage(Uri.fromFile(file));
                 } catch (Exception e) {
                 }
+            } else if (requestCode == 300) {
+                Bundle extras = data.getExtras();
+                bmpComplaintPic = extras.getParcelable("data");
+                imgComplaint.setImageBitmap(bmpComplaintPic);
             }
         }
     }
 
     @Override
     public void onValidationSucceeded() {
-        isComplaintComplete = true;
-        Toast.makeText(context, "Your complaint has been successfully submitted!", Toast.LENGTH_LONG).show();
-        onBackPressed();
+        Complaint complaint = new Complaint();
+        complaint.setCategory(selectedcategory);
+        complaint.setTitle(edtTitle.getText().toString());
+        complaint.setDescription(edtDescription.getText().toString());
+        complaint.setLocation(edtLocation.getText().toString());
+        complaint.setLandmark(edtLandmark.getText().toString());
+        complaint.setUser(mAppContext.getCirsUser());
+        complaint.setTimestamp(new Timestamp(System.currentTimeMillis()));
+
+        new VolleyRequest<Complaint>(mActivityContext).makeGsonRequest(
+                Request.Method.PUT,
+                Generator.getURLtoSendComplaint(),
+                complaint,
+                new Response.Listener<Complaint>() {
+                    @Override
+                    public void onResponse(Complaint response) {
+
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bmpComplaintPic.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] byteArray = stream.toByteArray();
+                        new VolleyRequest<byte[]>(mActivityContext).makeImageRequest(
+                                Generator.getUrltoUploadComplaintPic(response),
+                                "put",
+                                VolleyRequest.FileType.PNG,
+                                byteArray,
+                                new Response.Listener<Integer>() {
+                                    @Override
+                                    public void onResponse(Integer response) {
+                                        System.out.println("Response: " + response);
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        System.out.println("Error: " + error);
+                                    }
+                                }
+                        );
+
+                        isComplaintComplete = true;
+                        Toast.makeText(mActivityContext, "Your complaint has been submitted!", Toast.LENGTH_LONG).show();
+                        onBackPressed();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                },
+                Complaint.class);
     }
 
     @Override
@@ -249,7 +331,37 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
                 edtLocation, edtLandmark));
         for (EditText e : views)
             if (!e.getText().toString().trim().isEmpty()) return false;
-        if (isImageSet) return false;
+        if (isImageSet()) return false;
         return true;
+    }
+
+    private boolean isImageSet() {
+        return isImageSet;
+    }
+
+    private void setIsImageSet(boolean value) {
+        isImageSet = value;
+        if (isImageSet()) {
+            imgComplaint.setVisibility(View.VISIBLE);
+            txtRemove.setVisibility(View.VISIBLE);
+            floatingActionMenu.setVisibility(View.GONE);
+        } else {
+            floatingActionMenu.close(false);
+            imgComplaint.setVisibility(View.GONE);
+            txtRemove.setVisibility(View.GONE);
+            floatingActionMenu.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void cropCapturedImage(Uri picUri) {
+        Intent cropIntent = new Intent("com.android.camera.action.CROP");
+        cropIntent.setDataAndType(picUri, "image/*");
+        cropIntent.putExtra("crop", "true");
+        cropIntent.putExtra("aspectX", 1);
+        cropIntent.putExtra("aspectY", 1);
+        cropIntent.putExtra("outputX", 500);
+        cropIntent.putExtra("outputY", 500);
+        cropIntent.putExtra("return-data", true);
+        startActivityForResult(cropIntent, 300);
     }
 }

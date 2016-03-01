@@ -54,11 +54,13 @@
                     android:id="@+id/edt_username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:enabled="false"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
                     android:hint="@string/login_username"
                     android:inputType="text"
-                    android:singleLine="true"
-                     />
+                    android:longClickable="false"
+                    android:singleLine="true" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -72,8 +74,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/create_profile_firstname"
-                    android:inputType="textPersonName|textCapWords"
-                     />
+                    android:inputType="textPersonName|textCapWords" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -87,8 +88,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/create_profile_lastname"
-                    android:inputType="textPersonName|textCapWords"
-                     />
+                    android:inputType="textPersonName|textCapWords" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -116,8 +116,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/create_profile_dob"
-                    android:inputType="date"
-                     />
+                    android:inputType="date" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -131,8 +130,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/create_profile_email"
-                    android:inputType="textEmailAddress"
-                     />
+                    android:inputType="textEmailAddress" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -147,8 +145,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/create_profile_mobile_no"
                     android:inputType="phone"
-                    android:maxLength="10"
-                     />
+                    android:maxLength="10" />
             </android.support.design.widget.TextInputLayout>
         </RelativeLayout>
     </ScrollView>

@@ -19,12 +19,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cirs.R;
 import com.cirs.reportit.ui.fragments.TabBookmarkedFragment;
 import com.cirs.reportit.ui.fragments.TabMyReportsFragment;
 import com.cirs.reportit.ui.fragments.TabRecentFragment;
 import com.cirs.reportit.ui.adapters.ViewPagerAdapter;
 import com.cirs.reportit.utils.Constants;
-import com.example.kshitij.reportit.R;
 import com.github.clans.fab.FloatingActionButton;
 
 import java.io.FileInputStream;

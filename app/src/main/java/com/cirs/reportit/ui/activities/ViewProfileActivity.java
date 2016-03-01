@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -23,8 +25,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.cirs.R;
+import com.cirs.entities.CIRSUser;
+import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
-import com.example.kshitij.reportit.R;
+import com.cirs.reportit.utils.Generator;
+import com.cirs.reportit.utils.VolleyRequest;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -33,8 +42,11 @@ import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Pattern;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -78,7 +90,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     private ActionBar actionBar;
 
-    private Context context = this;
+    private Context mActivityContext = this;
 
     private Validator validator;
 
@@ -104,22 +116,33 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     private AlertDialog.Builder gendersDialog;
 
+    private boolean isImageChanged = false;
+
+    private ReportItApplication mAppContext;
+
+    private Bitmap bitmapProfilePic;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_profile);
+
+        mAppContext = (ReportItApplication) getApplicationContext();
+
         actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
         initializeViews();
-        validator = new Validator(context);
+        validator = new Validator(mActivityContext);
         pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
         linearLayout.requestFocus();
         views = new ArrayList<>(Arrays.asList(edtFirstname, edtLastname, edtGender, edtDOB, edtEmail, edtPhone));
-        toggleViews(views, false);
+
         initializeFields();
         setDatePicker();
         setListeners();
         createGendersDialog();
+        toggleViews(views, false);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -160,7 +183,15 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     private void toggleViews(List<EditText> views, boolean visibility) {
         for (View v : views) {
-            v.setEnabled(visibility);
+            v.setClickable(visibility);
+            v.setFocusable(visibility);
+            v.setFocusableInTouchMode(visibility);
+            v.setLongClickable(false);
+            if (!visibility) {
+                v.setOnClickListener(null);
+            } else {
+                setListeners();
+            }
         }
     }
 
@@ -170,12 +201,56 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
             startActivity(new Intent(ViewProfileActivity.this, HomeActivity.class));
             finish();
         } else
-            Toast.makeText(context, "Please save the changes first!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivityContext, "Please save the changes first!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onValidationSucceeded() {
-        saveToSharedPref();
+        if (isImageChanged) {
+            CIRSUser user = mAppContext.getCirsUser();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmapProfilePic.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            new VolleyRequest<byte[]>(mActivityContext).makeImageRequest(
+                    Generator.getURLtoUploadProfilePic(user),
+                    "put",
+                    VolleyRequest.FileType.PNG,
+                    byteArray,
+                    new Response.Listener<Integer>() {
+                        @Override
+                        public void onResponse(Integer response) {
+                            System.out.println("Response: " + response);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            System.out.println("Error: " + error);
+                        }
+                    }
+            );
+        }
+        if (hasAnyValueChanged()) {
+            saveToSharedPref();
+            CIRSUser user = mAppContext.getCirsUser();
+            new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
+                    Request.Method.PUT,
+                    Generator.getURLtoEditUser(user),
+                    user,
+                    new Response.Listener<CIRSUser>() {
+                        @Override
+                        public void onResponse(CIRSUser response) {
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                        }
+                    },
+                    CIRSUser.class
+            );
+        }
         inEditMode = false;
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(getResources().getString(R.string.title_activity_view_profile));
@@ -184,7 +259,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         floatingActionMenu.setVisibility(View.GONE);
         menuItem.setIcon(R.drawable.ic_edit);
         menuItem.setTitle(getResources().getString(R.string.view_profile_menu_item_title_edit));
-        linearLayout.requestFocus();
+        hideKeyboard();
     }
 
     @Override
@@ -194,6 +269,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
             String message = error.getCollatedErrorMessage(this);
             if (view instanceof EditText) {
                 ((EditText) view).setError(message);
+                view.requestFocus();
             } else {
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
@@ -202,21 +278,30 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (resultCode == RESULT_OK) {
-            isImageSet = true;
-            imgProfile.setVisibility(View.VISIBLE);
-            txtRemove.setVisibility(View.VISIBLE);
-            floatingActionMenu.setVisibility(View.GONE);
             if (requestCode == 100) {
-                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                saveImage(bitmap);
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator
+                        + Constants.FILE_PATH_PROFILE_PIC);
+                cropCapturedImage(Uri.fromFile(file));
             } else if (requestCode == 200) {
                 Uri uri = data.getData();
                 try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                    saveImage(bitmap);
+                    bitmapProfilePic = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    File file = new File(Environment.getExternalStorageDirectory() + File.separator
+                            + Constants.FILE_PATH_PROFILE_PIC);
+                    OutputStream outputStream = new FileOutputStream(file);
+                    bitmapProfilePic.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.flush();
+                    outputStream.close();
+                    cropCapturedImage(Uri.fromFile(file));
                 } catch (Exception e) {
                 }
+            } else if (requestCode == 300) {
+                Bundle extras = data.getExtras();
+                bitmapProfilePic = extras.getParcelable("data");
+                isImageSet = true;
+                saveImage(bitmapProfilePic);
             }
         }
     }
@@ -225,7 +310,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         isImageSet = true;
         try {
             FileOutputStream out;
-            out = context.openFileOutput(Constants.FILE_PATH_PROFILE_PIC, Context.MODE_PRIVATE);
+            out = mActivityContext.openFileOutput(Constants.FILE_PATH_PROFILE_PIC, Context.MODE_PRIVATE);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.close();
         } catch (Exception e) {
@@ -242,7 +327,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         }
         floatingActionMenu.setVisibility(View.GONE);
         try {
-            FileInputStream fis = context.openFileInput(Constants.FILE_PATH_PROFILE_PIC);
+            FileInputStream fis = mActivityContext.openFileInput(Constants.FILE_PATH_PROFILE_PIC);
             Bitmap b = BitmapFactory.decodeStream(fis);
             fis.close();
             imgProfile.setImageBitmap(b);
@@ -277,6 +362,8 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         edtDOB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!view.isClickable())
+                    return;
                 datePickerDialog.show();
             }
         });
@@ -284,6 +371,8 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         edtGender.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!view.isClickable())
+                    return;
                 gendersDialog.show();
             }
         });
@@ -298,7 +387,10 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         fabCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator
+                        + Constants.FILE_PATH_PROFILE_PIC);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
                 startActivityForResult(intent, 100);
             }
         });
@@ -316,6 +408,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         txtRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isImageChanged = true;
                 isImageSet = false;
                 floatingActionMenu.close(false);
                 imgProfile.setVisibility(View.GONE);
@@ -347,7 +440,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         datePickerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                linearLayout.requestFocus();
+                hideKeyboard();
             }
         });
     }
@@ -370,7 +463,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     private void createGendersDialog() {
         gendersDialog = new AlertDialog.Builder(this);
-        final ArrayList<String> gendersList = new ArrayList<String>(Arrays.asList("Male", "Female"));
+        final ArrayList<String> gendersList = new ArrayList<String>(Arrays.asList("MALE", "FEMALE"));
         ArrayAdapter<String> gendersAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, gendersList);
         gendersDialog.setTitle("Select Gender").setSingleChoiceItems(gendersAdapter, -1, new DialogInterface.OnClickListener() {
             @Override
@@ -381,7 +474,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         }).setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                linearLayout.requestFocus();
+                hideKeyboard();
             }
         }).create();
     }
@@ -398,4 +491,31 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         editor.commit();
     }
 
+    private void cropCapturedImage(Uri picUri) {
+        Intent cropIntent = new Intent("com.android.camera.action.CROP");
+        cropIntent.setDataAndType(picUri, "image/*");
+        cropIntent.putExtra("crop", "true");
+        cropIntent.putExtra("aspectX", 1);
+        cropIntent.putExtra("aspectY", 1);
+        cropIntent.putExtra("outputX", 500);
+        cropIntent.putExtra("outputY", 500);
+        cropIntent.putExtra("return-data", true);
+        startActivityForResult(cropIntent, 300);
+    }
+
+    private void hideKeyboard() {
+        linearLayout.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(linearLayout.getWindowToken(), 0);
+    }
+
+    private boolean hasAnyValueChanged() {
+        List<String> storedDetails = new ArrayList<>(mAppContext.getCirsUser().getAllFields());
+        for (int i = 0; i < storedDetails.size(); i++) {
+            if (!storedDetails.get(i).equals(views.get(i).getText().toString())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
