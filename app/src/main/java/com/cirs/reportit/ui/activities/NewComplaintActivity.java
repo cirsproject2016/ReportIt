@@ -1,5 +1,6 @@
 package com.cirs.reportit.ui.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -88,6 +89,8 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
 
     private Bitmap bmpComplaintPic;
 
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,7 +131,8 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
     @Override
     public void onBackPressed() {
         if (isComplaintComplete || areAllViewsEmpty()) {
-            super.onBackPressed();
+            startActivity(new Intent(NewComplaintActivity.this, HomeActivity.class));
+            finish();
         } else {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(mActivityContext);
             alertDialog.setTitle("Alert!")
@@ -162,6 +166,11 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
         fabGallery = (FloatingActionButton) findViewById(R.id.fab_from_gallery);
         imgComplaint = (ImageView) findViewById(R.id.img_complaint);
         txtRemove = (TextView) findViewById(R.id.txt_remove);
+        progressDialog = new ProgressDialog(mActivityContext);
+        progressDialog.setMessage("Submitting complaint");
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     }
 
     private void createCategoriesDialog() {
@@ -260,6 +269,7 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
 
     @Override
     public void onValidationSucceeded() {
+        progressDialog.show();
         Complaint complaint = new Complaint();
         complaint.setCategory(selectedcategory);
         complaint.setTitle(edtTitle.getText().toString());
@@ -288,26 +298,29 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
                                 new Response.Listener<Integer>() {
                                     @Override
                                     public void onResponse(Integer response) {
-                                        System.out.println("Response: " + response);
+                                        progressDialog.dismiss();
+                                        isComplaintComplete = true;
+                                        Toast.makeText(mActivityContext, "Your complaint has been submitted!", Toast.LENGTH_LONG).show();
+                                        onBackPressed();
                                     }
                                 },
                                 new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
-                                        System.out.println("Error: " + error);
+                                        progressDialog.dismiss();
+                                        error.printStackTrace();
+                                        Toast.makeText(mActivityContext, "There was an error uploading image", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                         );
-
-                        isComplaintComplete = true;
-                        Toast.makeText(mActivityContext, "Your complaint has been submitted!", Toast.LENGTH_LONG).show();
-                        onBackPressed();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
                         error.printStackTrace();
+                        Toast.makeText(mActivityContext, "There was an error. Please try again.", Toast.LENGTH_SHORT).show();
                     }
                 },
                 Complaint.class);

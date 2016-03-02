@@ -1,6 +1,7 @@
 package com.cirs.reportit.ui.activities;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -107,6 +109,8 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     private Bitmap bmpProfilePic;
 
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,7 +150,12 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     @Override
     public void onValidationSucceeded() {
-        CIRSUser user;
+        if (!isImageSet) {
+            Toast.makeText(mActivityContext, "Please select a profile picture", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        progressDialog.show();
+        final CIRSUser user;
         user = mAppContext.getCirsUser();
         user.setFirstName(edtFirstname.getText().toString().trim());
         user.setLastName(edtLastname.getText().toString().trim());
@@ -155,32 +164,6 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
         user.setEmail(edtEmail.getText().toString().trim());
         user.setPhone(edtPhone.getText().toString().trim());
 
-        if (isImageSet) {
-            bmpProfilePic = ((BitmapDrawable) imgProfile.getDrawable()).getBitmap();
-            setAndSaveImage(bmpProfilePic);
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bmpProfilePic.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            new VolleyRequest<byte[]>(mActivityContext).makeImageRequest(
-                    Generator.getURLtoUploadProfilePic(user),
-                    "put",
-                    VolleyRequest.FileType.PNG,
-                    byteArray,
-                    new Response.Listener<Integer>() {
-                        @Override
-                        public void onResponse(Integer response) {
-                            System.out.println("Response: " + response);
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            System.out.println("Error: " + error);
-                        }
-                    }
-            );
-        }
-
         new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
                 Request.Method.PUT,
                 Generator.getURLtoEditUser(user),
@@ -188,16 +171,45 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
                 new Response.Listener<CIRSUser>() {
                     @Override
                     public void onResponse(CIRSUser response) {
-                        saveToSharedPref();
-                        Toast.makeText(mActivityContext, "Profile Created!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(CreateProfileActivity.this, HomeActivity.class));
-                        finish();
+                        bmpProfilePic = ((BitmapDrawable) imgProfile.getDrawable()).getBitmap();
+                        setAndSaveImage(bmpProfilePic);
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bmpProfilePic.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] byteArray = stream.toByteArray();
+                        new VolleyRequest<byte[]>(mActivityContext).makeImageRequest(
+                                Generator.getURLtoUploadProfilePic(user),
+                                "put",
+                                VolleyRequest.FileType.PNG,
+                                byteArray,
+                                new Response.Listener<Integer>() {
+                                    @Override
+                                    public void onResponse(Integer response) {
+                                        saveToSharedPref();
+                                        progressDialog.dismiss();
+                                        Toast.makeText(mActivityContext, "Profile created", Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(CreateProfileActivity.this, HomeActivity.class));
+                                        finish();
+                                        System.out.println("Response: " + response);
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        progressDialog.dismiss();
+                                        error.printStackTrace();
+                                        Toast.makeText(mActivityContext, "There was some error uploading image", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                        );
+
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
                         error.printStackTrace();
+                        Toast.makeText(mActivityContext, "There was some error. Please try again.", Toast.LENGTH_LONG).show();
                     }
                 },
                 CIRSUser.class
@@ -247,6 +259,11 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
     }
 
     private void initializeViews() {
+        progressDialog = new ProgressDialog(mActivityContext);
+        progressDialog.setMessage("Creating profile");
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         edtFirstname = (EditText) findViewById(R.id.edt_firstname);
         edtLastname = (EditText) findViewById(R.id.edt_lastname);
         edtDOB = (EditText) findViewById(R.id.edt_dob);

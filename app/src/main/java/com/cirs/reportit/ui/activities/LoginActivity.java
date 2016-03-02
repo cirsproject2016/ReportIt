@@ -1,5 +1,6 @@
 package com.cirs.reportit.ui.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -41,6 +42,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private ReportItApplication mAppContext;
 
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +67,11 @@ public class LoginActivity extends AppCompatActivity {
         edtUsername = (EditText) findViewById(R.id.edt_username);
         edtPassword = (EditText) findViewById(R.id.edt_password);
         btnLogin = (Button) findViewById(R.id.btn_login);
+        progressDialog = new ProgressDialog(mActivityContext);
+        progressDialog.setMessage("Verifying credentials");
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     }
 
     private void saveToSharedPref() {
@@ -75,6 +83,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void validateCredentials() {
+        progressDialog.show();
         username = edtUsername.getText().toString().trim();
         password = edtPassword.getText().toString().trim();
         UserCred obj = new UserCred();
@@ -90,18 +99,20 @@ public class LoginActivity extends AppCompatActivity {
                         adminId = response.getAdmin().getId();
                         mAppContext.setCirsUser(response);
                         saveToSharedPref();
-                        Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                         if (!pref.getBoolean(Constants.SPUD_IS_PROFILE_CREATED, false)) {
                             startActivity(new Intent(LoginActivity.this, CreateProfileActivity.class));
                         } else {
                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                         }
+                        progressDialog.dismiss();
                         finish();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
                         edtUsername.setText("");
                         edtPassword.setText("");
                         System.out.println(error.toString());

@@ -1,5 +1,6 @@
 package com.cirs.reportit.ui.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,6 +21,7 @@ import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -38,6 +40,7 @@ import com.cirs.reportit.utils.VolleyRequest;
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 
 public class ViewComplaintActivity extends AppCompatActivity {
 
@@ -59,7 +62,9 @@ public class ViewComplaintActivity extends AppCompatActivity {
 
     private ReportItApplication mAppContext;
 
-    private TextView txtStatus, txtCategory, txtComplainant, txtDescription, txtLocation, txtLandmark;
+    private TextView txtStatus, txtCategory, txtComplainant, txtDescription, txtLocation, txtLandmark, txtPostedOn;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,13 @@ public class ViewComplaintActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_complaint);
 
         mAppContext = (ReportItApplication) getApplicationContext();
+
+        progressDialog = new ProgressDialog(mActivityContext);
+        progressDialog.setMessage("Loading");
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
 
         new VolleyRequest<Complaint>(mActivityContext).makeGsonRequest(
                 Request.Method.GET,
@@ -80,11 +92,14 @@ public class ViewComplaintActivity extends AppCompatActivity {
                         setListeners();
                         setSupportActionBar(toolbar);
                         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        progressDialog.dismiss();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        Toast.makeText(mActivityContext, "There was an error loading the requested complaint", Toast.LENGTH_LONG).show();
                         error.printStackTrace();
                         finish();
                     }
@@ -146,6 +161,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
         txtDescription = (TextView) findViewById(R.id.txt_description);
         txtLandmark = (TextView) findViewById(R.id.txt_landmark);
         txtLocation = (TextView) findViewById(R.id.txt_location);
+        txtPostedOn = (TextView) findViewById(R.id.txt_posted_on);
 
         String URL = Generator.getURLtoGetComplaintImage(complaint.getId());
         ImageLoader imageLoader = VolleyImageRequest.getInstance(mActivityContext).getImageLoader();
@@ -159,6 +175,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
         txtDescription.setText(complaint.getDescription());
         txtLocation.setText(complaint.getLocation());
         txtLandmark.setText(complaint.getLandmark());
+        txtPostedOn.setText(complaint.getTimestamp().toString());
 
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         collapsingToolbarLayout.setTitle(complaint.getTitle());
