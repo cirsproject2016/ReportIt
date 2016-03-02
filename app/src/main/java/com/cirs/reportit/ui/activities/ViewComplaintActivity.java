@@ -1,12 +1,7 @@
 package com.cirs.reportit.ui.activities;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -18,7 +13,6 @@ import android.view.View;
 import android.view.animation.AnimationSet;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -27,19 +21,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.cirs.R;
-import com.cirs.entities.CIRSUser;
 import com.cirs.entities.Complaint;
 import com.cirs.reportit.ReportItApplication;
-import com.cirs.reportit.utils.Constants;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyImageRequest;
 import com.cirs.reportit.utils.VolleyRequest;
 
-import org.w3c.dom.Text;
-
-import java.io.File;
-
 public class ViewComplaintActivity extends AppCompatActivity {
+
+    public static final String EXTRA_COMPLAINT_ID = "complaintId";
 
     private CollapsingToolbarLayout collapsingToolbarLayout;
 
@@ -70,7 +60,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
 
         new VolleyRequest<Complaint>(mActivityContext).makeGsonRequest(
                 Request.Method.GET,
-                Generator.getURLtoGetComplaintById(getIntent().getLongExtra("complaintId", -1)),
+                Generator.getURLtoGetComplaintById(getIntent().getLongExtra(EXTRA_COMPLAINT_ID, -1)),
                 null,
                 new Response.Listener<Complaint>() {
                     @Override
