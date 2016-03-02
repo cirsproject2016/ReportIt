@@ -6,10 +6,10 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,10 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cirs.R;
+import com.cirs.gcm.GcmUtils;
+import com.cirs.gcm.TokenRegistrationService;
+import com.cirs.reportit.ui.adapters.ViewPagerAdapter;
 import com.cirs.reportit.ui.fragments.TabBookmarkedFragment;
 import com.cirs.reportit.ui.fragments.TabMyReportsFragment;
 import com.cirs.reportit.ui.fragments.TabRecentFragment;
-import com.cirs.reportit.ui.adapters.ViewPagerAdapter;
 import com.cirs.reportit.utils.Constants;
 import com.github.clans.fab.FloatingActionButton;
 
@@ -74,6 +76,11 @@ public class HomeActivity extends AppCompatActivity
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
+
+        if(GcmUtils.checkPlayServices(this)){
+            Intent intent = new Intent(this, TokenRegistrationService.class);
+            startService(intent);
+        }
     }
 
     @Override

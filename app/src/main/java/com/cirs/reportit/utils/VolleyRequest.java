@@ -2,7 +2,7 @@ package com.cirs.reportit.utils;
 
 import android.content.Context;
 import android.os.Handler;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -16,17 +16,11 @@ import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -165,6 +159,7 @@ public class VolleyRequest<T> {
     private static class GsonRequest<T> extends JsonRequest<T> {
 
         private static Gson gson = getGson();
+        private Listener<T> listener;
 
         private static Gson getGson() {
             return new GsonBuilder().setDateFormat("dd MMM yyyy HH:mm:ss").create();
@@ -176,14 +171,16 @@ public class VolleyRequest<T> {
             super(method, url, gson.toJson(requestBody), listener, errorListener);
             String s = gson.toJson(requestBody);
             this.clazz = clazz;
+            this.listener = listener;
         }
 
         @Override
         protected Response<T> parseNetworkResponse(NetworkResponse response) {
             String json = new String(response.data);
-            System.out.println(json + " " + response.statusCode);
+            Log.d("VolleyRequest", "status: " + response.statusCode);
+            Log.d("VolleyRequest", "data: " + json);
             if (response.statusCode >= 200 && response.statusCode < 300) {
-                return Response.success(gson.fromJson(json, clazz), HttpHeaderParser.parseCacheHeaders(response));
+                return listener == null ? null : Response.success(gson.fromJson(json, clazz), HttpHeaderParser.parseCacheHeaders(response));
             } else {
                 VolleyError v = new VolleyError(response);
                 return Response.error(v);

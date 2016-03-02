@@ -6,7 +6,14 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.cirs.R;
+import com.cirs.entities.CIRSUser;
+import com.cirs.reportit.ReportItApplication;
+import com.cirs.reportit.utils.Generator;
+import com.cirs.reportit.utils.VolleyRequest;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
@@ -36,9 +43,6 @@ public class TokenRegistrationService extends IntentService {
             String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             // [END get_token]
-            Log.i(TAG, "GCM Registration Token: " + token);
-
-            // TODO: Implement this method to send any registration to your app's servers.
             sendRegistrationToServer(token);
 
             // You should store a boolean that indicates whether the generated token has been
@@ -70,7 +74,28 @@ public class TokenRegistrationService extends IntentService {
     private void sendRegistrationToServer(String token) {
         // Add custom implementation, as needed.
         Log.i(TAG,token);
-    }
+        CIRSUser user=((ReportItApplication)getApplication()).getCirsUser();
 
+        TokenEntity entity=new TokenEntity(user.getId(),token);
+        String url= Generator.getURLtoAddToken();
+        new VolleyRequest<Void>(getApplicationContext()).makeGsonRequest(Request.Method.PUT, url, entity, null, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                if(error.networkResponse!=null) {
+                    Log.d(TAG, "Error status: " + error.networkResponse.statusCode);
+                }
+            }
+        }, Void.class);
+    }
+    public static class TokenEntity{
+        public long id;
+        public String token;
+
+        public TokenEntity(long id, String token) {
+            this.id = id;
+            this.token = token;
+        }
+    }
 
 }

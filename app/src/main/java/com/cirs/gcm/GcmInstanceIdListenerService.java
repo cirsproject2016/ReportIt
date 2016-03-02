@@ -1,5 +1,7 @@
 package com.cirs.gcm;
 
+import android.content.Intent;
+
 import com.google.android.gms.iid.InstanceIDListenerService;
 
 /**
@@ -8,8 +10,8 @@ import com.google.android.gms.iid.InstanceIDListenerService;
 public class GcmInstanceIdListenerService extends InstanceIDListenerService {
     @Override
     public void onTokenRefresh() {
-        /*Intent intent = new Intent(this, RegistrationIntentService.class);
-        startService(intent);*/
+        Intent intent = new Intent(this, TokenRegistrationService.class);
+        startService(intent);
 
     }
 }
