@@ -5,12 +5,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import com.cirs.R;
 import com.cirs.entities.CIRSUser;
+import com.cirs.gcm.GcmUtils;
+import com.cirs.gcm.TokenRegistrationService;
 import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
+import com.google.android.gms.gcm.GcmListenerService;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -23,6 +25,13 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         mAppContext = (ReportItApplication) getApplicationContext();
+
+        if(GcmUtils.checkPlayServices(this)){
+                // Start IntentService to register this application with GCM.
+                Intent intent = new Intent(this, TokenRegistrationService.class);
+                Intent recIntent=new Intent(this, GcmListenerService.class);
+                startService(intent);
+        }
         pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
         getSupportActionBar().hide();
         new Handler().postDelayed(new Runnable() {
