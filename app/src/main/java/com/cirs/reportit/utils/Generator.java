@@ -50,4 +50,7 @@ public class Generator {
         return Constants.BASE_URI + "/complaint/" + id + "?adminId=" + pref.getLong(Constants.SPUD_ADMIN_ID, -1);
     }
 
+    public static String getURLtoAddToken(){
+        return Constants.BASE_URI+"/user/token";
+    }
 }

@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cirs">
 
+    <permission
+        android:name="com.cirs.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.cirs.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -49,11 +55,43 @@
         <activity
             android:name="com.cirs.reportit.ui.activities.ViewComplaintActivity"
             android:screenOrientation="portrait"
+	    android:parentActivityName="com.cirs.reportit.ui.activities.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
+    		<meta-data
+        	    android:name="android.support.PARENT_ACTIVITY"
+        	    android:value=".reportit.ui.activities.HomeActivity"/>
             <intent-filter>
                 <action android:name="com.cirs.VIEW_COMPLAINTS" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".gcm.GcmInstanceIdListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
+            </intent-filter>
+
+        </service>
+        <service
+            android:name=".gcm.GcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+
+        </service>
+        <service android:name=".gcm.TokenRegistrationService" android:exported="false" />
+
     </application>
 
 </manifest>
