@@ -191,7 +191,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
                 this.txtStatus.setText("IN PROGRESS");
                 resId = android.R.color.holo_orange_dark;
                 break;
-            case "COMPLETE":
+            case "COMPLETED":
                 resId = android.R.color.holo_green_dark;
                 break;
             case "REJECTED":
