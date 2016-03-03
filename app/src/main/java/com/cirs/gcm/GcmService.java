@@ -29,7 +29,10 @@ public class GcmService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         // normal downstream message.
-        Long compId = data.getLong(EXTRA_COMPLAINT_ID);
+		for(String s:data.keySet()){
+			Log.i(TAG, "key:" + s+" value:"+data.get(s) + " type:"+data.get(s).getClass().getName());
+		}
+        Long compId = Long.valueOf(data.get(EXTRA_COMPLAINT_ID)+"");
         String status = data.getString(EXTRA_NEW_STATUS);
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "compId: " + compId);
