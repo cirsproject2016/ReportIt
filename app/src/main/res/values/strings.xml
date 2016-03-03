@@ -63,5 +63,6 @@
     <string name="view_complaint_admin_remarks">Admin Remarks</string>
     <string name="view_complaint_upvotes">Upvotes</string>
     <string name="view_complaint_comments">Comments</string>
+    <string name="view_complaint_posted_on">Posted on</string>
 
 </resources>

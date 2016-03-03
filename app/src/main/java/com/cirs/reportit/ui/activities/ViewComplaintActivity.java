@@ -1,5 +1,6 @@
 package com.cirs.reportit.ui.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -15,6 +16,7 @@ import android.view.animation.AnimationSet;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -51,7 +53,9 @@ public class ViewComplaintActivity extends AppCompatActivity {
 
     private ReportItApplication mAppContext;
 
-    private TextView txtStatus, txtCategory, txtComplainant, txtDescription, txtLocation, txtLandmark;
+    private TextView txtStatus, txtCategory, txtComplainant, txtDescription, txtLocation, txtLandmark, txtPostedOn;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,13 @@ public class ViewComplaintActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_complaint);
 
         mAppContext = (ReportItApplication) getApplicationContext();
+
+        progressDialog = new ProgressDialog(mActivityContext);
+        progressDialog.setMessage("Loading");
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
 
         new VolleyRequest<Complaint>(mActivityContext).makeGsonRequest(
                 Request.Method.GET,
@@ -72,11 +83,14 @@ public class ViewComplaintActivity extends AppCompatActivity {
                         setListeners();
                         setSupportActionBar(toolbar);
                         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        progressDialog.dismiss();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        Toast.makeText(mActivityContext, "There was an error loading the requested complaint", Toast.LENGTH_LONG).show();
                         error.printStackTrace();
                         if(error instanceof TimeoutError){
 							Log.d("ViewComplaintActivity", "Timeouterror");
@@ -142,6 +156,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
         txtDescription = (TextView) findViewById(R.id.txt_description);
         txtLandmark = (TextView) findViewById(R.id.txt_landmark);
         txtLocation = (TextView) findViewById(R.id.txt_location);
+        txtPostedOn = (TextView) findViewById(R.id.txt_posted_on);
 
         String URL = Generator.getURLtoGetComplaintImage(complaint.getId());
         ImageLoader imageLoader = VolleyImageRequest.getInstance(mActivityContext).getImageLoader();
@@ -155,6 +170,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
         txtDescription.setText(complaint.getDescription());
         txtLocation.setText(complaint.getLocation());
         txtLandmark.setText(complaint.getLandmark());
+        txtPostedOn.setText(complaint.getTimestamp().toString());
 
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         collapsingToolbarLayout.setTitle(complaint.getTitle());
