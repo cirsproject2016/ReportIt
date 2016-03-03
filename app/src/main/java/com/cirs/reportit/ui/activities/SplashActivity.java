@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import com.cirs.R;
 import com.cirs.entities.CIRSUser;
