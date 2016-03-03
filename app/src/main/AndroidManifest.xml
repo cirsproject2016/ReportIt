@@ -55,7 +55,11 @@
         <activity
             android:name="com.cirs.reportit.ui.activities.ViewComplaintActivity"
             android:screenOrientation="portrait"
+	    android:parentActivityName="com.cirs.reportit.ui.activities.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
+    		<meta-data
+        	    android:name="android.support.PARENT_ACTIVITY"
+        	    android:value=".reportit.ui.activities.HomeActivity"/>
             <intent-filter>
                 <action android:name="com.cirs.VIEW_COMPLAINTS" />
             </intent-filter>
