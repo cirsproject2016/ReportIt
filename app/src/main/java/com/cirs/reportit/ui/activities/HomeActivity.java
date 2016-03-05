@@ -77,7 +77,7 @@ public class HomeActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
 
-        if(GcmUtils.checkPlayServices(this)){
+        if (GcmUtils.checkPlayServices(this)) {
             Intent intent = new Intent(this, TokenRegistrationService.class);
             startService(intent);
         }
@@ -85,12 +85,7 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+        finish();
     }
 
     @Override
@@ -122,6 +117,7 @@ public class HomeActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_logout:
+                GcmUtils.invalidateToken(this);
                 editor.clear();
                 editor.commit();
                 Toast.makeText(context, "Successfully logged out!", Toast.LENGTH_SHORT).show();

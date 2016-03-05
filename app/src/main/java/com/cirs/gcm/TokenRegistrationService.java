@@ -18,6 +18,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import static com.cirs.gcm.GcmUtils.SENT_TOKEN_TO_SERVER;
+import static com.cirs.gcm.GcmUtils.sendRegistrationToServer;
 
 /**
  * Created by Rohan on 02-03-2016.
@@ -43,8 +44,8 @@ public class TokenRegistrationService extends IntentService {
             String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             // [END get_token]
-            sendRegistrationToServer(token);
-
+            sendRegistrationToServer(this, token);
+            ReportItApplication.setGcmToken(token);
             // You should store a boolean that indicates whether the generated token has been
             // sent to your server. If the boolean is false, send the token to your server,
             // otherwise your server should have already received the token.
@@ -71,31 +72,5 @@ public class TokenRegistrationService extends IntentService {
      *
      * @param token The new token.
      */
-    private void sendRegistrationToServer(String token) {
-        // Add custom implementation, as needed.
-        Log.i(TAG,token);
-        CIRSUser user=((ReportItApplication)getApplication()).getCirsUser();
-
-        TokenEntity entity=new TokenEntity(user.getId(),token);
-        String url= Generator.getURLtoAddToken();
-        new VolleyRequest<Void>(getApplicationContext()).makeGsonRequest(Request.Method.PUT, url, entity, null, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-                if(error.networkResponse!=null) {
-                    Log.d(TAG, "Error status: " + error.networkResponse.statusCode);
-                }
-            }
-        }, Void.class);
-    }
-    public static class TokenEntity{
-        public long id;
-        public String token;
-
-        public TokenEntity(long id, String token) {
-            this.id = id;
-            this.token = token;
-        }
-    }
 
 }

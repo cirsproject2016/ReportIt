@@ -2,6 +2,7 @@ package com.cirs.reportit.ui.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -9,6 +10,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,11 +94,11 @@ public class ViewComplaintActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         Toast.makeText(mActivityContext, "There was an error loading the requested complaint", Toast.LENGTH_LONG).show();
                         error.printStackTrace();
-                        if(error instanceof TimeoutError){
-							Log.d("ViewComplaintActivity", "Timeouterror");
-							return;
-						}
-						finish();
+                        if (error instanceof TimeoutError) {
+                            Log.d("ViewComplaintActivity", "Timeouterror");
+                            return;
+                        }
+                        finish();
                     }
                 },
                 Complaint.class);
@@ -166,7 +168,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
 
         setStatus(complaint.getStatus());
         txtCategory.setText(complaint.getCategory().toString());
-        txtComplainant.setText(complaint.getUser().toString());
+        setTxtComplainant();
         txtDescription.setText(complaint.getDescription());
         txtLocation.setText(complaint.getLocation());
         txtLandmark.setText(complaint.getLandmark());
@@ -202,6 +204,22 @@ public class ViewComplaintActivity extends AppCompatActivity {
                 break;
         }
         this.txtStatus.setTextColor(getResources().getColor(resId));
+    }
+
+    private void setTxtComplainant() {
+        if (complaint.getUser().getId() == mAppContext.getCirsUser().getId()) {
+            txtComplainant.setText("You");
+        } else {
+            txtComplainant.setText(Html.fromHtml("<u>" + complaint.getUser().toString() + "</u>"));
+            txtComplainant.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+            txtComplainant.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(ViewComplaintActivity.this, ViewUserActivity.class)
+                            .putExtra("userId", complaint.getUser().getId()));
+                }
+            });
+        }
     }
 
     private void setListeners() {

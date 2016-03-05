@@ -97,6 +97,14 @@ public class CIRSUser {
         this.admin = admin;
     }
 
+    public List<Complaint> getComplaintList() {
+        return complaintList;
+    }
+
+    public void setComplaintList(List<Complaint> complaintList) {
+        this.complaintList = complaintList;
+    }
+
     @Override
     public String toString() {
         return getFirstName() + " " + getLastName();

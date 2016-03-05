@@ -29,6 +29,16 @@ public class ReportItApplication extends Application {
 
     private ArrayList<Category> categories = new ArrayList<>();
 
+    private static String gcmToken;
+
+    public static String getGcmToken() {
+        return gcmToken;
+    }
+
+    public static void setGcmToken(String gcmToken) {
+        ReportItApplication.gcmToken = gcmToken;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
