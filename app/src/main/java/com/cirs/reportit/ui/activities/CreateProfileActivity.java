@@ -7,12 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,10 +27,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.cirs.R;
 import com.cirs.entities.CIRSUser;
 import com.cirs.reportit.ReportItApplication;
+import com.cirs.reportit.utils.CircularNetworkImageView;
 import com.cirs.reportit.utils.Constants;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyImageRequest;
@@ -54,8 +52,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CreateProfileActivity extends AppCompatActivity implements Validator.ValidationListener {
 
@@ -91,7 +87,7 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     private FloatingActionButton fabGallery;
 
-    private NetworkImageView imgProfile;
+    private CircularNetworkImageView imgProfile;
 
     private TextView txtRemove;
 
@@ -273,7 +269,7 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
         floatingActionMenu = (FloatingActionMenu) findViewById(R.id.fam_add_pic);
         fabCamera = (FloatingActionButton) findViewById(R.id.fab_from_camera);
         fabGallery = (FloatingActionButton) findViewById(R.id.fab_from_gallery);
-        imgProfile = (NetworkImageView) findViewById(R.id.img_profile_pic);
+        imgProfile = (CircularNetworkImageView) findViewById(R.id.img_profile_pic);
         txtRemove = (TextView) findViewById(R.id.txt_remove);
 
         CIRSUser user = mAppContext.getCirsUser();

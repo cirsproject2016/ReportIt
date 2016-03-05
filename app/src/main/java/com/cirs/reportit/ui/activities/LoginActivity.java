@@ -18,6 +18,7 @@ import com.cirs.R;
 import com.cirs.entities.CIRSUser;
 import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
+import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyRequest;
 
 public class LoginActivity extends AppCompatActivity {
@@ -91,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
         obj.password = password;
         new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
                 Request.Method.POST,
-                Constants.BASE_URI + "/user",
+                Generator.getURLtoLoginUser(),
                 obj,
                 new Response.Listener<CIRSUser>() {
                     @Override
@@ -116,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
                         edtUsername.setText("");
                         edtPassword.setText("");
                         System.out.println(error.toString());
-                        Toast.makeText(mActivityContext, "Invalid userName and password!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(mActivityContext, "Invalid username and password!", Toast.LENGTH_LONG).show();
                     }
                 },
                 CIRSUser.class);

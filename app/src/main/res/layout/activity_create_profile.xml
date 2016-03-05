@@ -90,8 +90,11 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/til_mobile"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/standard_field_height"
-                android:layout_below="@id/til_email">
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_email"
+                android:minHeight="@dimen/standard_field_height"
+                app:counterEnabled="true"
+                app:counterMaxLength="10">
 
                 <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/edt_mobile"
@@ -102,15 +105,16 @@
                     android:maxLength="10" />
             </android.support.design.widget.TextInputLayout>
 
-            <com.android.volley.toolbox.NetworkImageView
+            <com.cirs.reportit.utils.CircularNetworkImageView
                 android:id="@+id/img_profile_pic"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
                 android:layout_below="@id/til_mobile"
                 android:layout_centerHorizontal="true"
+
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_my_profile"
-                android:visibility="gone" />
+                android:visibility="visible" />
 
             <TextView
                 android:id="@+id/txt_remove"

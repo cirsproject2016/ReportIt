@@ -136,8 +136,11 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/til_mobile"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/standard_field_height"
-                android:layout_below="@id/til_email">
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_email"
+                android:minHeight="@dimen/standard_field_height"
+                app:counterEnabled="true"
+                app:counterMaxLength="10">
 
                 <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/edt_mobile"

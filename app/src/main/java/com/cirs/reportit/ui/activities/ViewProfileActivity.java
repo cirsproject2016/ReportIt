@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -122,6 +123,8 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     private Bitmap bitmapProfilePic;
 
+    private TextInputLayout tilPhone;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,6 +186,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     private void toggleViews(List<EditText> views, boolean visibility) {
         for (View v : views) {
+            tilPhone.setCounterEnabled(visibility);
             v.setClickable(visibility);
             v.setFocusable(visibility);
             v.setFocusableInTouchMode(visibility);
@@ -349,6 +353,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         floatingActionMenu = (FloatingActionMenu) findViewById(R.id.fam_add_pic);
         fabCamera = (FloatingActionButton) findViewById(R.id.fab_from_camera);
         fabGallery = (FloatingActionButton) findViewById(R.id.fab_from_gallery);
+        tilPhone = (TextInputLayout) findViewById(R.id.til_mobile);
     }
 
     private void setListeners() {
