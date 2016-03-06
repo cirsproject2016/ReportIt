@@ -29,7 +29,6 @@ public class UserComplaintsViewHolder extends RecyclerView.ViewHolder implements
         this.complaint = complaint;
         this.context = context;
         txtComplaintTitle.setText(Html.fromHtml("<u>" + this.complaint.getTitle() + "</u>"));
-        System.out.println(txtComplaintTitle.getText());
     }
 
     @Override
