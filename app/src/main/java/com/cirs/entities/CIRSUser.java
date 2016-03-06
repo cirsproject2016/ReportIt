@@ -23,7 +23,7 @@ public class CIRSUser {
 
     private Admin admin;
 
-    private List<Complaint> complaintList;
+    private List<Complaint> complaints;
 
     public Long getId() {
         return id;
@@ -97,12 +97,12 @@ public class CIRSUser {
         this.admin = admin;
     }
 
-    public List<Complaint> getComplaintList() {
-        return complaintList;
+    public List<Complaint> getComplaints() {
+        return complaints;
     }
 
-    public void setComplaintList(List<Complaint> complaintList) {
-        this.complaintList = complaintList;
+    public void setComplaints(List<Complaint> complaints) {
+        this.complaints = complaints;
     }
 
     @Override

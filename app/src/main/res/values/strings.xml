@@ -65,4 +65,11 @@
     <string name="view_complaint_comments">Comments</string>
     <string name="view_complaint_posted_on">Posted on</string>
 
+    <!--View User Activity-->
+    <string name="view_user_details">Details</string>
+    <string name="view_user_gender">Gender :&#160;</string>
+    <string name="view_user_dob">Date of Birth :&#160;</string>
+    <string name="view_user_email">Email :&#160;</string>
+    <string name="view_user_phone">Mobile No. :&#160;</string>
+    <string name="view_user_complaints">Complaints</string>
 </resources>

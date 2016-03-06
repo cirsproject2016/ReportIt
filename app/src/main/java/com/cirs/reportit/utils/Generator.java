@@ -56,6 +56,11 @@ public class Generator {
 
     public static String getURLtoLoginUser() {
         pref = ReportItApplication.getmAppContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
-        return Constants.BASE_URI + "/user?adminId=" + pref.getLong(Constants.SPUD_ADMIN_ID, -1);
+        return Constants.BASE_URI + "/user";
+    }
+
+    public static String getURLtoGetUserById(Long id) {
+        pref = ReportItApplication.getmAppContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
+        return Constants.BASE_URI + "/user/" + id + "?adminId=" + pref.getLong(Constants.SPUD_ADMIN_ID, -1) + "";
     }
 }
