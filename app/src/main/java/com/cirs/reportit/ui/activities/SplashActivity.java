@@ -15,19 +15,16 @@ public class SplashActivity extends AppCompatActivity {
 
     private SharedPreferences pref;
 
-    private ReportItApplication mAppContext;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        mAppContext = (ReportItApplication) getApplicationContext();
         pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
         getSupportActionBar().hide();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                CIRSUser cirsUser = mAppContext.getCirsUser();
+                CIRSUser cirsUser = ReportItApplication.getCirsUser();
                 if (pref.getBoolean(Constants.SPUD_IS_SIGNED_IN, false)) {
                     if (pref.getBoolean(Constants.SPUD_IS_PROFILE_CREATED, false)) {
                         startActivity(new Intent(SplashActivity.this, HomeActivity.class));

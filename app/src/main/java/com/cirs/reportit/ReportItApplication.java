@@ -9,25 +9,21 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.cirs.entities.CIRSUser;
 import com.cirs.entities.Category;
-import com.cirs.entities.Complaint;
 import com.cirs.reportit.utils.Constants;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyRequest;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 public class ReportItApplication extends Application {
 
-    private SharedPreferences pref;
+    private static SharedPreferences pref;
 
-    private SharedPreferences.Editor editor;
+    private static SharedPreferences.Editor editor;
 
     private static Context mAppContext;
 
-    private ArrayList<Category> categories = new ArrayList<>();
+    private static ArrayList<Category> categories = new ArrayList<>();
 
     private static String gcmToken;
 
@@ -47,7 +43,7 @@ public class ReportItApplication extends Application {
         fetchCategories();
     }
 
-    public CIRSUser getCirsUser() {
+    public static CIRSUser getCirsUser() {
         CIRSUser cirsUser = new CIRSUser();
         cirsUser.setId(pref.getLong(Constants.SPUD_USER_ID, -1));
         cirsUser.setFirstName(pref.getString(Constants.SPUD_FIRSTNAME, null));
@@ -59,7 +55,7 @@ public class ReportItApplication extends Application {
         return cirsUser;
     }
 
-    public void setCirsUser(CIRSUser cirsUser) {
+    public static void setCirsUser(CIRSUser cirsUser) {
         editor = pref.edit();
         editor.putLong(Constants.SPUD_USER_ID, cirsUser.getId());
         editor.putString(Constants.SPUD_FIRSTNAME, cirsUser.getFirstName());
@@ -75,11 +71,11 @@ public class ReportItApplication extends Application {
         return mAppContext;
     }
 
-    public ArrayList<Category> getCategories() {
+    public static ArrayList<Category> getCategories() {
         return categories;
     }
 
-    private void fetchCategories() {
+    private static void fetchCategories() {
         new VolleyRequest<Category[]>(mAppContext).makeGsonRequest(
                 Request.Method.GET,
                 Generator.getURLtoFetchCategoriesFromServer(),

@@ -101,8 +101,6 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     private AlertDialog.Builder gendersDialog;
 
-    private ReportItApplication mAppContext;
-
     private Bitmap bmpProfilePic;
 
     private ProgressDialog progressDialog;
@@ -111,8 +109,6 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_profile);
-
-        mAppContext = (ReportItApplication) getApplicationContext();
 
         validator = new Validator(mActivityContext);
         pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
@@ -152,7 +148,7 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
         }
         progressDialog.show();
         final CIRSUser user;
-        user = mAppContext.getCirsUser();
+        user = ReportItApplication.getCirsUser();
         user.setFirstName(edtFirstname.getText().toString().trim());
         user.setLastName(edtLastname.getText().toString().trim());
         user.setGender(edtGender.getText().toString().trim());
@@ -272,7 +268,7 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
         imgProfile = (CircularNetworkImageView) findViewById(R.id.img_profile_pic);
         txtRemove = (TextView) findViewById(R.id.txt_remove);
 
-        CIRSUser user = mAppContext.getCirsUser();
+        CIRSUser user = ReportItApplication.getCirsUser();
         edtFirstname.setText(user.getFirstName());
         edtLastname.setText(user.getLastName());
         edtGender.setText(user.getGender());

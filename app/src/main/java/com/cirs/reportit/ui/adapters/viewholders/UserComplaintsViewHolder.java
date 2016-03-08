@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cirs.entities.Complaint;
 import com.cirs.reportit.ui.activities.ViewComplaintActivity;

@@ -119,8 +119,6 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     private boolean isImageChanged = false;
 
-    private ReportItApplication mAppContext;
-
     private Bitmap bitmapProfilePic;
 
     private TextInputLayout tilPhone;
@@ -129,8 +127,6 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_profile);
-
-        mAppContext = (ReportItApplication) getApplicationContext();
 
         actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -211,7 +207,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
     @Override
     public void onValidationSucceeded() {
         if (isImageChanged) {
-            CIRSUser user = mAppContext.getCirsUser();
+            CIRSUser user = ReportItApplication.getCirsUser();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmapProfilePic.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
@@ -236,7 +232,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
         }
         if (hasAnyValueChanged()) {
             saveToSharedPref();
-            CIRSUser user = mAppContext.getCirsUser();
+            CIRSUser user = ReportItApplication.getCirsUser();
             new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
                     Request.Method.PUT,
                     Generator.getURLtoEditUser(user),
@@ -515,7 +511,7 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
     }
 
     private boolean hasAnyValueChanged() {
-        List<String> storedDetails = new ArrayList<>(mAppContext.getCirsUser().getAllFields());
+        List<String> storedDetails = new ArrayList<>(ReportItApplication.getCirsUser().getAllFields());
         for (int i = 0; i < storedDetails.size(); i++) {
             if (!storedDetails.get(i).equals(views.get(i).getText().toString())) {
                 return true;

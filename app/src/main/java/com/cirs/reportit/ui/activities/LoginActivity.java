@@ -41,16 +41,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private Long adminId;
 
-    private ReportItApplication mAppContext;
-
     private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        mAppContext = (ReportItApplication) getApplicationContext();
 
         initializeViews();
 
@@ -98,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(CIRSUser response) {
                         adminId = response.getAdmin().getId();
-                        mAppContext.setCirsUser(response);
+                        ReportItApplication.setCirsUser(response);
                         saveToSharedPref();
                         Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                         if (!pref.getBoolean(Constants.SPUD_IS_PROFILE_CREATED, false)) {

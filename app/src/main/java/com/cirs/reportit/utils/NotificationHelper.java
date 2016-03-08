@@ -14,7 +14,7 @@ import com.cirs.R;
  */
 public class NotificationHelper {
 
-    public static  void showNotification(Context context,String title, String message,PendingIntent pendingIntent){
+    public static void showNotification(Context context, String title, String message, PendingIntent pendingIntent) {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)

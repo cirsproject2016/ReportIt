@@ -6,14 +6,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.cirs.R;
-import com.cirs.entities.CIRSUser;
 import com.cirs.reportit.ReportItApplication;
-import com.cirs.reportit.utils.Generator;
-import com.cirs.reportit.utils.VolleyRequest;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
@@ -24,7 +18,8 @@ import static com.cirs.gcm.GcmUtils.sendRegistrationToServer;
  * Created by Rohan on 02-03-2016.
  */
 public class TokenRegistrationService extends IntentService {
-    public static final String TAG=TokenRegistrationService.class.getSimpleName();
+    public static final String TAG = TokenRegistrationService.class.getSimpleName();
+
     public TokenRegistrationService() {
         super(TAG);
     }

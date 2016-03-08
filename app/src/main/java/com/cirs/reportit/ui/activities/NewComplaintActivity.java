@@ -83,8 +83,6 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
 
     private boolean isComplaintComplete = false;
 
-    private ReportItApplication mAppContext;
-
     private Category selectedcategory;
 
     private Bitmap bmpComplaintPic;
@@ -95,7 +93,6 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_complaint);
-        mAppContext = (ReportItApplication) getApplicationContext();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         validator = new Validator(mActivityContext);
         initializeViews();
@@ -175,7 +172,7 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
 
     private void createCategoriesDialog() {
         categoriesDialog = new AlertDialog.Builder(this);
-        final ArrayList<Category> categoriesList = new ArrayList<>(mAppContext.getCategories());
+        final ArrayList<Category> categoriesList = new ArrayList<>(ReportItApplication.getCategories());
         ArrayAdapter<Category> categoriesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, categoriesList);
         categoriesDialog.setTitle("Select Category").setSingleChoiceItems(categoriesAdapter, -1, new DialogInterface.OnClickListener() {
             @Override
@@ -276,7 +273,7 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
         complaint.setDescription(edtDescription.getText().toString());
         complaint.setLocation(edtLocation.getText().toString());
         complaint.setLandmark(edtLandmark.getText().toString());
-        complaint.setUser(mAppContext.getCirsUser());
+        complaint.setUser(ReportItApplication.getCirsUser());
         complaint.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
         new VolleyRequest<Complaint>(mActivityContext).makeGsonRequest(

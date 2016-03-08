@@ -20,7 +20,6 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,11 +29,13 @@ import java.util.concurrent.Executors;
 public final class GcmUtils {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
-    private GcmUtils(){
+    private GcmUtils() {
         throw new AssertionError();
     }
-    public static final String SENT_TOKEN_TO_SERVER="token_sent";
+
+    public static final String SENT_TOKEN_TO_SERVER = "token_sent";
     public static final String REGISTRATION_COMPLETE = "registrationComplete";
+
     public static boolean checkPlayServices(Activity context) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int resultCode = apiAvailability.isGooglePlayServicesAvailable(context);
@@ -50,9 +51,9 @@ public final class GcmUtils {
         return true;
     }
 
-    public static void invalidateToken(final Context context){
-        CIRSUser user=((ReportItApplication)context.getApplicationContext()).getCirsUser();
-        ExecutorService ex= Executors.newSingleThreadExecutor();
+    public static void invalidateToken(final Context context) {
+        CIRSUser user = ReportItApplication.getCirsUser();
+        ExecutorService ex = Executors.newSingleThreadExecutor();
         ex.execute(new Runnable() {
             @Override
             public void run() {
@@ -66,29 +67,31 @@ public final class GcmUtils {
         });
         ex.shutdown();
         sendRegistrationToServer(context, null);
-        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(context);
-        Editor edit=prefs.edit();
-        edit.putBoolean(SENT_TOKEN_TO_SERVER,false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Editor edit = prefs.edit();
+        edit.putBoolean(SENT_TOKEN_TO_SERVER, false);
         edit.commit();
     }
+
     public static void sendRegistrationToServer(Context context, String token) {
         // Add custom implementation, as needed.
-        Log.i("TokenRegistration",token+"");
-        CIRSUser user=((ReportItApplication)context.getApplicationContext()).getCirsUser();
+        Log.i("TokenRegistration", token + "");
+        CIRSUser user = ReportItApplication.getCirsUser();
 
-        TokenEntity entity=new TokenEntity(user.getId(),token);
-        String url= Generator.getURLtoAddToken();
+        TokenEntity entity = new TokenEntity(user.getId(), token);
+        String url = Generator.getURLtoAddToken();
         new VolleyRequest<Void>(context.getApplicationContext()).makeGsonRequest(Request.Method.PUT, url, entity, null, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
-                if(error.networkResponse!=null) {
+                if (error.networkResponse != null) {
                     Log.d("TokenRegistration", "Error status: " + error.networkResponse.statusCode);
                 }
             }
         }, Void.class);
     }
-    public static class TokenEntity{
+
+    public static class TokenEntity {
         public long id;
         public String token;
 

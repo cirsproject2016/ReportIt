@@ -62,8 +62,8 @@ public class VolleyRequest<T> {
             throw new NullPointerException("Url and class cannot be null");
         }
         Request<T> request = new GsonRequest<T>(clazz, method, url, object, listener, errorListener);
-	request.setRetryPolicy(new DefaultRetryPolicy(
-        	10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
 
     }

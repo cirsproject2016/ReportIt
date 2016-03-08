@@ -53,8 +53,6 @@ public class ViewComplaintActivity extends AppCompatActivity {
 
     private Context mActivityContext = this;
 
-    private ReportItApplication mAppContext;
-
     private TextView txtStatus, txtCategory, txtComplainant, txtDescription, txtLocation, txtLandmark, txtPostedOn;
 
     private ProgressDialog progressDialog;
@@ -63,8 +61,6 @@ public class ViewComplaintActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_complaint);
-
-        mAppContext = (ReportItApplication) getApplicationContext();
 
         progressDialog = new ProgressDialog(mActivityContext);
         progressDialog.setMessage("Loading");
@@ -207,7 +203,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
     }
 
     private void setTxtComplainant() {
-        if (complaint.getUser().getId() == mAppContext.getCirsUser().getId()) {
+        if (complaint.getUser().getId() == ReportItApplication.getCirsUser().getId()) {
             txtComplainant.setText("You");
         } else {
             txtComplainant.setText(Html.fromHtml("<u>" + complaint.getUser().toString() + "</u>"));
