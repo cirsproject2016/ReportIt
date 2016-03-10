@@ -72,4 +72,7 @@
     <string name="view_user_email">Email :&#160;</string>
     <string name="view_user_phone">Mobile No. :&#160;</string>
     <string name="view_user_complaints">Complaints</string>
+
+    <!-- Error strings-->
+    <string name="err_not_connected">No connection</string>
 </resources>

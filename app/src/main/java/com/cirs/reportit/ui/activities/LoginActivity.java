@@ -1,5 +1,6 @@
 package com.cirs.reportit.ui.activities;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import com.cirs.R;
 import com.cirs.entities.CIRSUser;
 import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
+import com.cirs.reportit.utils.ErrorUtils;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyRequest;
 
@@ -86,6 +88,12 @@ public class LoginActivity extends AppCompatActivity {
         UserCred obj = new UserCred();
         obj.userName = username;
         obj.password = password;
+        //Show error message if not connected, and return without making a request
+		if(!ErrorUtils.isConnected(this)){
+			new AlertDialog.Builder(this).setMessage("Go online to login").setPositiveButton("OK",null).create().show();
+			progressDialog.dismiss();
+			return;
+		}
         new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
                 Request.Method.POST,
                 Generator.getURLtoLoginUser(),

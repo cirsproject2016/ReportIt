@@ -32,6 +32,7 @@ import com.cirs.entities.CIRSUser;
 import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.CircularNetworkImageView;
 import com.cirs.reportit.utils.Constants;
+import com.cirs.reportit.utils.ErrorUtils;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyImageRequest;
 import com.cirs.reportit.utils.VolleyRequest;
@@ -155,7 +156,6 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
         user.setDob(edtDOB.getText().toString().trim());
         user.setEmail(edtEmail.getText().toString().trim());
         user.setPhone(edtPhone.getText().toString().trim());
-
         new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
                 Request.Method.PUT,
                 Generator.getURLtoEditUser(user),
@@ -201,7 +201,8 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
                         error.printStackTrace();
-                        Toast.makeText(mActivityContext, "There was some error. Please try again.", Toast.LENGTH_LONG).show();
+                        String message=ErrorUtils.parseVolleyError(error);  //In case of existing email
+						Toast.makeText(mActivityContext, message, Toast.LENGTH_LONG).show();
                     }
                 },
                 CIRSUser.class
