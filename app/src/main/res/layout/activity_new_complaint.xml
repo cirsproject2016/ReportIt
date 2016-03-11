@@ -46,17 +46,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/til_category"
-                android:minHeight="@dimen/standard_field_height"
-                app:counterEnabled="true"
-                app:counterMaxLength="30">
+                android:minHeight="@dimen/standard_field_height">
 
                 <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/edt_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/new_complaint_title"
-                    android:inputType="textCapSentences"
-                    android:maxLength="30" />
+                    android:inputType="textCapSentences" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -64,17 +61,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/til_title"
-                android:minHeight="@dimen/standard_field_height"
-                app:counterEnabled="true"
-                app:counterMaxLength="100">
+                android:minHeight="@dimen/standard_field_height">
 
                 <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/edt_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/new_complaint_description"
-                    android:inputType="textCapSentences|textMultiLine"
-                    android:maxLength="100" />
+                    android:inputType="textCapSentences|textMultiLine" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -82,17 +76,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/til_description"
-                android:minHeight="@dimen/standard_field_height"
-                app:counterEnabled="true"
-                app:counterMaxLength="100">
+                android:minHeight="@dimen/standard_field_height">
 
                 <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/edt_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/new_complaint_location"
-                    android:inputType="textCapSentences|textMultiLine"
-                    android:maxLength="100" />
+                    android:inputType="textCapSentences|textMultiLine" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -100,17 +91,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/til_location"
-                android:minHeight="@dimen/standard_field_height"
-                app:counterEnabled="true"
-                app:counterMaxLength="40">
+                android:minHeight="@dimen/standard_field_height">
 
                 <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/edt_landmark"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/new_complaint_landmark"
-                    android:inputType="textCapSentences|textMultiLine"
-                    android:maxLength="40" />
+                    android:inputType="textCapSentences|textMultiLine" />
             </android.support.design.widget.TextInputLayout>
 
             <ImageView

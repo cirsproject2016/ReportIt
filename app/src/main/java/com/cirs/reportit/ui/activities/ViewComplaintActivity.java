@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.animation.AnimationSet;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,6 +57,10 @@ public class ViewComplaintActivity extends AppCompatActivity {
     private TextView txtStatus, txtCategory, txtComplainant, txtDescription, txtLocation, txtLandmark, txtPostedOn;
 
     private ProgressDialog progressDialog;
+
+    private Button btnUpvote, btnComment;
+
+    private TextView txtTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +160,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
         txtLandmark = (TextView) findViewById(R.id.txt_landmark);
         txtLocation = (TextView) findViewById(R.id.txt_location);
         txtPostedOn = (TextView) findViewById(R.id.txt_posted_on);
+        txtTitle = (TextView) findViewById(R.id.txt_title);
 
         String URL = Generator.getURLtoGetComplaintImage(complaint.getId());
         ImageLoader imageLoader = VolleyImageRequest.getInstance(mActivityContext).getImageLoader();
@@ -169,6 +175,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
         txtLocation.setText(complaint.getLocation());
         txtLandmark.setText(complaint.getLandmark());
         txtPostedOn.setText(complaint.getTimestamp().toString());
+        txtTitle.setText(complaint.getTitle());
 
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         collapsingToolbarLayout.setTitle(complaint.getTitle());
@@ -176,6 +183,11 @@ public class ViewComplaintActivity extends AppCompatActivity {
         float screenWidth = getResources().getDisplayMetrics().widthPixels;
         CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
         lp.height = (int) screenWidth;
+
+        btnComment = (Button) findViewById(R.id.btn_comment);
+        btnUpvote = (Button) findViewById(R.id.btn_upvote);
+        btnComment.setText(complaint.getCommentsCount() + "");
+        btnUpvote.setText(complaint.getUpvotes() + "");
     }
 
     private void setStatus(String status) {
@@ -231,6 +243,14 @@ public class ViewComplaintActivity extends AppCompatActivity {
                     floatingActionButton.setImageResource(R.drawable.ic_bookmark);
                     setIsBookmarked(false);
                 }
+            }
+        });
+        btnComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mActivityContext, ViewCommentsActivity.class);
+                intent.putExtra("complaintId", complaint.getId());
+                startActivity(intent);
             }
         });
     }

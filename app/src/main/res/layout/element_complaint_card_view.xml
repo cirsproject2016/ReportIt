@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="200dp"
     android:layout_margin="10dp"
+    card_view:cardElevation="@dimen/card_view_elevation"
     card_view:cardUseCompatPadding="true">
 
     <LinearLayout
@@ -64,6 +65,11 @@
 
         </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -81,80 +87,57 @@
                 android:textStyle="bold" />
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:paddingRight="1dp"
-                android:paddingTop="1dp">
+                android:orientation="horizontal">
 
-                <ToggleButton
-                    android:id="@+id/toggle_btn_upvotes"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="0dp"
+                <View
+                    android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:layout_marginRight="-5dp"
-                    android:layout_weight="2"
-                    android:background="@android:color/white"
-                    android:checked="false"
-                    android:drawableRight="@drawable/selector_check_upvote"
-                    android:textOff=""
-                    android:textOn="" />
+                    android:background="@android:color/darker_gray" />
 
-                <TextView
-                    android:id="@+id/txt_upvotes"
+                <Button
+                    android:id="@+id/btn_upvote"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@android:color/white"
-                    android:gravity="center_vertical" />
-            </LinearLayout>
+                    android:drawableLeft="@drawable/ic_action_upvote_off"
+                    android:paddingLeft="3dp" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:paddingRight="1dp"
-                android:paddingTop="1dp">
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/darker_gray" />
 
                 <Button
                     android:id="@+id/btn_comment"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="-5dp"
-                    android:layout_weight="2"
-                    android:background="@android:color/white"
-                    android:drawableRight="@drawable/ic_action_comment" />
-
-                <TextView
-                    android:id="@+id/txt_comments"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@android:color/white"
-                    android:gravity="center_vertical" />
-            </LinearLayout>
+                    android:drawableLeft="@drawable/ic_action_comment"
+                    android:paddingLeft="3dp" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:paddingTop="1dp">
-
-                <ToggleButton
-                    android:id="@+id/toggle_btn_bookmark"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="match_parent"
+                <View
+                    android:layout_width="1dp"
                     android:layout_height="match_parent"
+                    android:background="@android:color/darker_gray" />
+
+                <ImageButton
+                    android:id="@+id/imgbtn_bookmark"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:background="@android:color/white"
-                    android:checked="false"
-                    android:drawableLeft="@drawable/selector_check_bookmark"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:paddingLeft="7dp"
-                    android:textOff=""
-                    android:textOn="" />
+                    android:src="@drawable/ic_action_bookmark_off" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/darker_gray" />
             </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.CardView>

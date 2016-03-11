@@ -75,7 +75,7 @@ public class ReportItApplication extends Application {
         return categories;
     }
 
-    private static void fetchCategories() {
+    public static void fetchCategories() {
         new VolleyRequest<Category[]>(mAppContext).makeGsonRequest(
                 Request.Method.GET,
                 Generator.getURLtoFetchCategoriesFromServer(),
@@ -84,7 +84,8 @@ public class ReportItApplication extends Application {
                     @Override
                     public void onResponse(Category[] response) {
                         for (Category category : response) {
-                            categories.add(category);
+                            if (!categories.contains(category))
+                                categories.add(category);
                         }
                         System.out.println(response);
                     }

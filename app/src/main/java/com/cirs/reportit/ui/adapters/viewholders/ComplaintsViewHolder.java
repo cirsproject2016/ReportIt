@@ -6,13 +6,14 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.cirs.R;
 import com.cirs.entities.Complaint;
+import com.cirs.reportit.ui.activities.ViewCommentsActivity;
 import com.cirs.reportit.ui.activities.ViewComplaintActivity;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyImageRequest;
@@ -21,11 +22,11 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
 
     private NetworkImageView imgComplaint;
 
-    private TextView txtTitle, txtDescription, txtTimeStamp, txtStatus, txtUpVotes, txtComments;
+    private TextView txtTitle, txtDescription, txtTimeStamp, txtStatus;
 
-    private Button btnComments;
+    private Button btnComment, btnUpvote;
 
-    private ToggleButton tglbtnUpVotes, tglbtnBookmark;
+    private ImageButton imgbtnBookmark;
 
     private CardView cardView;
 
@@ -42,11 +43,11 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
         this.txtDescription = (TextView) itemView.findViewById(R.id.txt_description);
         this.txtTimeStamp = (TextView) itemView.findViewById(R.id.txt_timestamp);
         this.txtStatus = (TextView) itemView.findViewById(R.id.txt_status);
-        this.txtUpVotes = (TextView) itemView.findViewById(R.id.txt_upvotes);
-        this.txtComments = (TextView) itemView.findViewById(R.id.txt_comments);
-        this.btnComments = (Button) itemView.findViewById(R.id.btn_comment);
-        this.tglbtnUpVotes = (ToggleButton) itemView.findViewById(R.id.toggle_btn_upvotes);
-        this.tglbtnBookmark = (ToggleButton) itemView.findViewById(R.id.toggle_btn_bookmark);
+        this.btnUpvote = (Button) itemView.findViewById(R.id.btn_upvote);
+        this.btnComment = (Button) itemView.findViewById(R.id.btn_comment);
+        this.imgbtnBookmark = (ImageButton) itemView.findViewById(R.id.imgbtn_bookmark);
+        this.btnComment.setOnClickListener(this);
+        this.btnUpvote.setOnClickListener(this);
     }
 
     public void setFields(Complaint complaint, Context context) {
@@ -56,9 +57,11 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
         this.txtDescription.setText(complaint.getDescription());
         this.txtTimeStamp.setText(complaint.getTimestamp().toString());
         setStatus(complaint.getStatus());
-        this.txtUpVotes.setText(complaint.getUpvotes() + "");
-        this.txtComments.setText(complaint.getCommentsCount() + "");
-        this.tglbtnBookmark.setChecked(complaint.isBookmarked());
+        this.btnUpvote.setText(complaint.getUpvotes() + "");
+        this.btnComment.setText(complaint.getCommentsCount() + "");
+        if (complaint.isBookmarked()) {
+            this.imgbtnBookmark.setImageResource(R.drawable.ic_action_bookmark_on);
+        }
 
         String URL = Generator.getURLtoGetComplaintImage(complaint.getId());
         ImageLoader imageLoader = VolleyImageRequest.getInstance(context).getImageLoader();
@@ -69,9 +72,15 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
 
     @Override
     public void onClick(View view) {
-        Intent intent = new Intent(context, ViewComplaintActivity.class);
-        intent.putExtra("complaintId", complaint.getId());
-        context.startActivity(intent);
+        if (view == cardView) {
+            Intent intent = new Intent(context, ViewComplaintActivity.class);
+            intent.putExtra("complaintId", complaint.getId());
+            context.startActivity(intent);
+        } else if (view.getId() == R.id.btn_comment) {
+            Intent intent = new Intent(context, ViewCommentsActivity.class);
+            intent.putExtra("complaintId", complaint.getId());
+            context.startActivity(intent);
+        }
     }
 
     private void setStatus(String status) {

@@ -2,15 +2,15 @@ package com.cirs.entities;
 
 import java.sql.Timestamp;
 
-public class Comment {
+public class Comment implements Comparable<Comment> {
 
     private Long id;
 
-    private CIRSUser commenter;
+    private CIRSUser user;
 
-    private String comment;
+    private String data;
 
-    private Timestamp timestamp;
+    private Timestamp time;
 
     private Complaint complaint;
 
@@ -22,28 +22,28 @@ public class Comment {
         this.id = id;
     }
 
-    public CIRSUser getCommenter() {
-        return commenter;
+    public CIRSUser getUser() {
+        return user;
     }
 
-    public void setCommenter(CIRSUser commenter) {
-        this.commenter = commenter;
+    public void setUser(CIRSUser user) {
+        this.user = user;
     }
 
-    public String getComment() {
-        return comment;
+    public String getData() {
+        return data;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setData(String data) {
+        this.data = data;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
+    public Timestamp getTime() {
+        return time;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
+    public void setTime(Timestamp time) {
+        this.time = time;
     }
 
     public Complaint getComplaint() {
@@ -52,5 +52,10 @@ public class Comment {
 
     public void setComplaint(Complaint complaint) {
         this.complaint = complaint;
+    }
+
+    @Override
+    public int compareTo(Comment comment) {
+        return this.time.compareTo(comment.time);
     }
 }

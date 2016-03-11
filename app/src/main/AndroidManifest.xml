@@ -55,7 +55,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".reportit.ui.activities.ViewComplaintActivity"
-            android:parentActivityName="com.cirs.reportit.ui.activities.HomeActivity"
+            android:parentActivityName=".reportit.ui.activities.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -69,6 +69,12 @@
             android:name=".reportit.ui.activities.ViewUserActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".reportit.ui.activities.ViewCommentsActivity"
+            android:label="@string/title_activity_view_comments"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
