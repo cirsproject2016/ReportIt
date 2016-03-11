@@ -63,4 +63,8 @@ public class Generator {
         pref = ReportItApplication.getmAppContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
         return Constants.BASE_URI + "/user/" + id + "?adminId=" + pref.getLong(Constants.SPUD_ADMIN_ID, -1) + "";
     }
+
+    public static String getURLtoSendComment() {
+        return Constants.BASE_URI + "/comment";
+    }
 }

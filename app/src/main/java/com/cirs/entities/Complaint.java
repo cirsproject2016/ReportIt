@@ -31,6 +31,8 @@ public class Complaint implements Comparable<Complaint> {
 
     private Comment[] comments;
 
+    private boolean upvoted;
+
     public Integer getUpvotes() {
         return upvotes;
     }
@@ -137,6 +139,14 @@ public class Complaint implements Comparable<Complaint> {
 
     public int getCommentsCount() {
         return comments.length;
+    }
+
+    public boolean isUpvoted() {
+        return upvoted;
+    }
+
+    public void setUpvoted(boolean upvoted) {
+        this.upvoted = upvoted;
     }
 
     @Override

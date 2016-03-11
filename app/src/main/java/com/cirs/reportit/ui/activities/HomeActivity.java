@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.cirs.R;
 import com.cirs.gcm.GcmUtils;
 import com.cirs.gcm.TokenRegistrationService;
+import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.ui.adapters.ViewPagerAdapter;
 import com.cirs.reportit.ui.fragments.TabBookmarkedFragment;
 import com.cirs.reportit.ui.fragments.TabMyReportsFragment;
@@ -76,6 +77,8 @@ public class HomeActivity extends AppCompatActivity
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
+
+        ReportItApplication.fetchCategories();
 
         if (GcmUtils.checkPlayServices(this)) {
             Intent intent = new Intent(this, TokenRegistrationService.class);

@@ -78,7 +78,28 @@ public class TabRecentFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(false);
+                new VolleyRequest<Complaint[]>(getActivity()).makeGsonRequest(
+                        Request.Method.GET,
+                        Generator.getURLtoFetchAllComplaints(),
+                        null,
+                        new Response.Listener<Complaint[]>() {
+                            @Override
+                            public void onResponse(Complaint[] response) {
+                                Arrays.sort(response);
+                                complaints = response;
+                                recyclerView.setAdapter(new ComplaintsAdapter(complaints, getActivity()));
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                swipeRefreshLayout.setRefreshing(false);
+                                error.printStackTrace();
+                                Toast.makeText(getActivity(), "There was an error loading complaints", Toast.LENGTH_LONG).show();
+                            }
+                        },
+                        Complaint[].class);
             }
         });
         return view;

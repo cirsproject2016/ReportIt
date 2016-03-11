@@ -25,6 +25,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.cirs.R;
+import com.cirs.entities.CIRSUser;
 import com.cirs.entities.Category;
 import com.cirs.entities.Complaint;
 import com.cirs.reportit.ReportItApplication;
@@ -99,6 +100,7 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
         linearLayout.requestFocus();
         createCategoriesDialog();
         setListeners();
+        ReportItApplication.fetchCategories();
     }
 
 
@@ -273,7 +275,9 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
         complaint.setDescription(edtDescription.getText().toString());
         complaint.setLocation(edtLocation.getText().toString());
         complaint.setLandmark(edtLandmark.getText().toString());
-        complaint.setUser(ReportItApplication.getCirsUser());
+        CIRSUser user = new CIRSUser();
+        user.setId(ReportItApplication.getCirsUser().getId());
+        complaint.setUser(user);
         complaint.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
         new VolleyRequest<Complaint>(mActivityContext).makeGsonRequest(

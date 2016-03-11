@@ -7,6 +7,7 @@
     <string name="title_activity_create_profile">Create Profile</string>
     <string name="title_activity_view_profile">My Profile</string>
     <string name="title_activity_new_complaint">New Complaint</string>
+    <string name="title_activity_view_comments">Comments</string>
 
     <!--Login Activity-->
     <string name="login_username">Username</string>
@@ -64,6 +65,7 @@
     <string name="view_complaint_upvotes">Upvotes</string>
     <string name="view_complaint_comments">Comments</string>
     <string name="view_complaint_posted_on">Posted on</string>
+    <string name="view_complaint_title">Title</string>
 
     <!--View User Activity-->
     <string name="view_user_details">Details</string>
@@ -72,4 +74,8 @@
     <string name="view_user_email">Email :&#160;</string>
     <string name="view_user_phone">Mobile No. :&#160;</string>
     <string name="view_user_complaints">Complaints</string>
+
+    <!--View Comments Activity-->
+    <string name="view_comments_comment">Enter comment here</string>
+    <string name="view_comments_no_comment">No comments to display</string>
 </resources>
