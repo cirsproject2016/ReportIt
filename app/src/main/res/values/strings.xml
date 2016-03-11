@@ -78,4 +78,7 @@
     <!--View Comments Activity-->
     <string name="view_comments_comment">Enter comment here</string>
     <string name="view_comments_no_comment">No comments to display</string>
+
+    <!-- Error strings-->
+    <string name="err_not_connected">No connection</string>
 </resources>

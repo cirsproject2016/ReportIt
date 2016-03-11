@@ -38,8 +38,9 @@ import java.util.concurrent.Executors;
 
 public class VolleyRequest<T> {
     private static RequestQueue queue;
-
+    private static Context context;
     public VolleyRequest(Context context) {
+        this.context=context;
         if (queue == null) {
             queue = Volley.newRequestQueue(context);
         }
@@ -173,6 +174,7 @@ public class VolleyRequest<T> {
         public GsonRequest(Class<T> clazz, int method, String url, Object requestBody, Listener<T> listener, ErrorListener errorListener) {
             super(method, url, gson.toJson(requestBody), listener, errorListener);
             String s = gson.toJson(requestBody);
+			Log.d("VolleyRequest",s);
             this.clazz = clazz;
             this.listener = listener;
         }

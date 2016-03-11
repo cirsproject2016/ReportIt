@@ -1,6 +1,7 @@
 package com.cirs.reportit.ui.activities;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,13 +9,14 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +35,7 @@ import com.cirs.R;
 import com.cirs.entities.CIRSUser;
 import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
+import com.cirs.reportit.utils.ErrorUtils;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyRequest;
 import com.github.clans.fab.FloatingActionButton;
@@ -122,7 +125,9 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
     private Bitmap bitmapProfilePic;
 
     private TextInputLayout tilPhone;
-
+	
+	private static final String TAG=ViewProfileActivity.class.getSimpleName();
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +163,11 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
             case R.id.menu_item_edit_or_confirm:
                 menuItem = item;
                 if (!inEditMode) {
+                    //Don't allow user to edit if offline.
+					if(!ErrorUtils.isConnected(ViewProfileActivity.this)){
+						new AlertDialog.Builder(ViewProfileActivity.this).setMessage("Cannot edit offline").setPositiveButton("OK",null).create().show();
+						return true;
+					}
                     inEditMode = true;
                     if (isImageSet) {
                         txtRemove.setVisibility(View.VISIBLE);
@@ -231,8 +241,11 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
             );
         }
         if (hasAnyValueChanged()) {
-            saveToSharedPref();
-            CIRSUser user = ReportItApplication.getCirsUser();
+            //saveToSharedPref();
+            //retrieve value from fields
+            final CIRSUser user = createUserFromFields();
+			final ProgressDialog dialog=ProgressDialog.show(ViewProfileActivity.this, null, "Changing Details", true, false);
+            //make request
             new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
                     Request.Method.PUT,
                     Generator.getURLtoEditUser(user),
@@ -240,28 +253,52 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
                     new Response.Listener<CIRSUser>() {
                         @Override
                         public void onResponse(CIRSUser response) {
+                            //if OK, save, and end editing
+							saveToSharedPref();
+							inEditMode = false;
+							actionBar.setDisplayHomeAsUpEnabled(true);
+							actionBar.setTitle(getResources().getString(R.string.title_activity_view_profile));
+							toggleViews(views, false);
+							txtRemove.setVisibility(View.GONE);
+							floatingActionMenu.setVisibility(View.GONE);
+							menuItem.setIcon(R.drawable.ic_edit);
+							menuItem.setTitle(getResources().getString(R.string.view_profile_menu_item_title_edit));
+							hideKeyboard();
+							dialog.dismiss();
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            error.printStackTrace();
+                            //if not, reset value of email text, show error and remain in edit mode.
+							error.printStackTrace();
+							Log.d(TAG,"in on error response");
+							String message=ErrorUtils.parseVolleyError(error);
+							new AlertDialog.Builder(ViewProfileActivity.this).setMessage(message).setPositiveButton("OK",null).create().show();
+							dialog.dismiss();					
+							Log.i(TAG,"reverting to previous email" + ReportItApplication.getCirsUser().getEmail());
+                            edtEmail.setText(ReportItApplication.getCirsUser().getEmail());
                         }
                     },
                     CIRSUser.class
             );
         }
-        inEditMode = false;
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(getResources().getString(R.string.title_activity_view_profile));
-        toggleViews(views, false);
-        txtRemove.setVisibility(View.GONE);
-        floatingActionMenu.setVisibility(View.GONE);
-        menuItem.setIcon(R.drawable.ic_edit);
-        menuItem.setTitle(getResources().getString(R.string.view_profile_menu_item_title_edit));
-        hideKeyboard();
+
     }
 
+	
+	private CIRSUser createUserFromFields(){
+		CIRSUser user=new CIRSUser();
+		user.setId(ReportItApplication.getCirsUser().getId());
+		user.setFirstName(edtFirstname.getText().toString());
+		user.setLastName(edtLastname.getText().toString());
+		user.setGender(edtGender.getText().toString());
+		user.setDob(edtDOB.getText().toString());
+		user.setEmail(edtEmail.getText().toString());
+		user.setPhone(edtPhone.getText().toString());
+		return user;
+	}
+	
     @Override
     public void onValidationFailed(List<ValidationError> errors) {
         for (ValidationError error : errors) {

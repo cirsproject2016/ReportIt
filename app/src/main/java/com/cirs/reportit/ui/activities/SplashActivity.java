@@ -10,6 +10,7 @@ import com.cirs.R;
 import com.cirs.entities.CIRSUser;
 import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
+import com.cirs.reportit.utils.ErrorUtils;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -19,6 +20,8 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        //Show user if hes not connected
+		ErrorUtils.showErrorIfNotConnected(this);
         pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
         getSupportActionBar().hide();
         new Handler().postDelayed(new Runnable() {
