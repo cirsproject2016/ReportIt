@@ -21,6 +21,7 @@ import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
 import com.cirs.reportit.utils.ErrorUtils;
 import com.cirs.reportit.utils.Generator;
+import com.cirs.reportit.utils.SecUtils;
 import com.cirs.reportit.utils.VolleyRequest;
 
 public class LoginActivity extends AppCompatActivity {
@@ -84,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
     private void validateCredentials() {
         progressDialog.show();
         username = edtUsername.getText().toString().trim();
-        password = edtPassword.getText().toString().trim();
+        password = SecUtils.hash(edtPassword.getText().toString().trim());
         UserCred obj = new UserCred();
         obj.userName = username;
         obj.password = password;
