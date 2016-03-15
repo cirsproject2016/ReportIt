@@ -105,6 +105,12 @@
             android:name=".gcm.TokenRegistrationService"
             android:exported="false" />
 
+        <provider
+            android:name=".reportit.db.dbhelpers.CirsAppContentProvider"
+            android:authorities="com.cirs.reportit.db"
+            android:enabled="true"
+            android:exported="true" />
+
     </application>
 
 </manifest>

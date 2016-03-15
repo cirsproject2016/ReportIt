@@ -31,7 +31,7 @@ public class ComplaintsAdapter extends RecyclerView.Adapter {
             return new BlankViewHolder(view);
         }
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.element_complaint_card_view, parent, false);
-        return new ComplaintsViewHolder(view);
+        return new ComplaintsViewHolder(view, this);
     }
 
     @Override

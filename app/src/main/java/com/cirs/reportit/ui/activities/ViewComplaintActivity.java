@@ -29,10 +29,14 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.cirs.R;
 import com.cirs.entities.Complaint;
+import com.cirs.entities.Upvote;
 import com.cirs.reportit.ReportItApplication;
+import com.cirs.reportit.db.dbhelpers.QueryHelper;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyImageRequest;
 import com.cirs.reportit.utils.VolleyRequest;
+
+import java.util.List;
 
 public class ViewComplaintActivity extends AppCompatActivity {
 
@@ -42,7 +46,9 @@ public class ViewComplaintActivity extends AppCompatActivity {
 
     private FloatingActionButton floatingActionButton;
 
-    private boolean isBookmarked = false;
+    private boolean isBookmarked;
+
+    private boolean isUpvoted;
 
     private NetworkImageView imgComplaint;
 
@@ -117,11 +123,13 @@ public class ViewComplaintActivity extends AppCompatActivity {
     }
 
     private boolean isBookmarked() {
-        return isBookmarked;
+        return this.isBookmarked;
     }
 
     private void setIsBookmarked(boolean isBookmarked) {
         this.isBookmarked = isBookmarked;
+        complaint.setBookmarked(isBookmarked);
+        new QueryHelper(mActivityContext).insertOrUpdateComplaint(complaint);
     }
 
     private void rotate(View v, boolean clockwise) {
@@ -186,8 +194,24 @@ public class ViewComplaintActivity extends AppCompatActivity {
 
         btnComment = (Button) findViewById(R.id.btn_comment);
         btnUpvote = (Button) findViewById(R.id.btn_upvote);
-        btnComment.setText(complaint.getCommentsCount() + "");
+        btnComment.setText(complaint.getCommentCount() + "");
         btnUpvote.setText(complaint.getUpvotes() + "");
+
+        isUpvoted = ReportItApplication.checkIfComplaintIsUpvoted(complaint.getId());
+        if (isUpvoted) {
+            this.btnUpvote.setCompoundDrawablesWithIntrinsicBounds(getResources()
+                    .getDrawable(R.drawable.ic_action_upvote_on), null, null, null);
+        } else {
+            this.btnUpvote.setCompoundDrawablesWithIntrinsicBounds(getResources()
+                    .getDrawable(R.drawable.ic_action_upvote_off), null, null, null);
+        }
+
+        isBookmarked = new QueryHelper(mActivityContext).isBookmarked(complaint);
+        if (isBookmarked()) {
+            floatingActionButton.setImageResource(R.drawable.ic_bookmark_on);
+        } else {
+            floatingActionButton.setImageResource(R.drawable.ic_bookmark);
+        }
     }
 
     private void setStatus(String status) {
@@ -253,5 +277,44 @@ public class ViewComplaintActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        btnUpvote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isUpvoted) {
+                    Upvote upvote = new Upvote();
+                    upvote.setUser(complaint.getUser());
+                    upvote.setComplaint(complaint);
+                    new VolleyRequest<UpvoteResponse>(mActivityContext).makeGsonRequest(
+                            Request.Method.PUT,
+                            Generator.getURLtoUpvote(),
+                            new Upvote[]{upvote},
+                            new Response.Listener<UpvoteResponse>() {
+                                @Override
+                                public void onResponse(UpvoteResponse response) {
+                                    ReportItApplication.addIdToUpvotedSet(complaint.getId());
+                                    Toast.makeText(mActivityContext, "You upvoted this complaint", Toast.LENGTH_SHORT).show();
+                                    isUpvoted = true;
+                                    btnUpvote.setCompoundDrawablesWithIntrinsicBounds(getResources()
+                                            .getDrawable(R.drawable.ic_action_upvote_on), null, null, null);
+                                    complaint.setUpvoted(true);
+                                    new QueryHelper(mActivityContext).insertOrUpdateComplaint(complaint);
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    error.printStackTrace();
+                                    Toast.makeText(mActivityContext, "This complaint could not be upvoted", Toast.LENGTH_SHORT).show();
+                                }
+                            },
+                            UpvoteResponse.class);
+                }
+            }
+        });
+    }
+
+    private static class UpvoteResponse {
+        private int created;
+        private List<Upvote> failures;
     }
 }

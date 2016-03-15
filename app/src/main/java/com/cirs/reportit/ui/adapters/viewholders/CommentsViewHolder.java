@@ -6,9 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.cirs.R;
 import com.cirs.entities.CIRSUser;
@@ -18,11 +15,7 @@ import com.cirs.reportit.ui.activities.ViewUserActivity;
 import com.cirs.reportit.utils.CircularNetworkImageView;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyImageRequest;
-import com.cirs.reportit.utils.VolleyRequest;
 
-/**
- * Created by Kshitij on 10-03-2016.
- */
 public class CommentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     private CircularNetworkImageView imgUser;

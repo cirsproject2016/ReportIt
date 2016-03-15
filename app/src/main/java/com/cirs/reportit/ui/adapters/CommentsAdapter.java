@@ -10,9 +10,6 @@ import com.cirs.entities.Comment;
 import com.cirs.reportit.ui.adapters.viewholders.BlankViewHolder;
 import com.cirs.reportit.ui.adapters.viewholders.CommentsViewHolder;
 
-/**
- * Created by Kshitij on 09-03-2016.
- */
 public class CommentsAdapter extends RecyclerView.Adapter {
 
     private Comment[] comments;

@@ -1,18 +1,14 @@
 package com.cirs.reportit.utils;
 
-import android.content.SharedPreferences;
-
 import com.cirs.entities.CIRSUser;
 import com.cirs.entities.Complaint;
 import com.cirs.reportit.ReportItApplication;
+import com.pixplicity.easyprefs.library.Prefs;
 
 public class Generator {
 
-    private static SharedPreferences pref;
-
     public static String getURLtoEditUser(CIRSUser user) {
-        pref = ReportItApplication.getmAppContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
-        return Constants.BASE_URI + "/user/" + user.getId() + "?adminId=" + pref.getLong(Constants.SPUD_ADMIN_ID, -1) + "";
+        return Constants.BASE_URI + "/user/" + user.getId() + "?adminId=" + Prefs.getLong(Constants.SPUD_ADMIN_ID, -1) + "";
     }
 
     public static String getURLtoUploadProfilePic(CIRSUser user) {
@@ -20,8 +16,7 @@ public class Generator {
     }
 
     public static String getURLtoFetchCategoriesFromServer() {
-        pref = ReportItApplication.getmAppContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
-        return Constants.BASE_URI + "/cat/?adminId=" + pref.getLong(Constants.SPUD_ADMIN_ID, -1) + "&activeOnly=true";
+        return Constants.BASE_URI + "/cat/?adminId=" + Prefs.getLong(Constants.SPUD_ADMIN_ID, -1) + "&activeOnly=true";
     }
 
     public static String getURLtoSendComplaint() {
@@ -33,8 +28,7 @@ public class Generator {
     }
 
     public static String getURLtoFetchAllComplaints() {
-        pref = ReportItApplication.getmAppContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
-        return Constants.BASE_URI + "/complaint?adminId=" + pref.getLong(Constants.SPUD_ADMIN_ID, -1);
+        return Constants.BASE_URI + "/complaint?adminId=" + Prefs.getLong(Constants.SPUD_ADMIN_ID, -1);
     }
 
     public static String getURLtoGetUserImage(long id) {
@@ -46,8 +40,7 @@ public class Generator {
     }
 
     public static String getURLtoGetComplaintById(Long id) {
-        pref = ReportItApplication.getmAppContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
-        return Constants.BASE_URI + "/complaint/" + id + "?adminId=" + pref.getLong(Constants.SPUD_ADMIN_ID, -1);
+        return Constants.BASE_URI + "/complaint/" + id + "?adminId=" + Prefs.getLong(Constants.SPUD_ADMIN_ID, -1);
     }
 
     public static String getURLtoAddToken() {
@@ -55,16 +48,22 @@ public class Generator {
     }
 
     public static String getURLtoLoginUser() {
-        pref = ReportItApplication.getmAppContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
         return Constants.BASE_URI + "/user";
     }
 
     public static String getURLtoGetUserById(Long id) {
-        pref = ReportItApplication.getmAppContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
-        return Constants.BASE_URI + "/user/" + id + "?adminId=" + pref.getLong(Constants.SPUD_ADMIN_ID, -1) + "";
+        return Constants.BASE_URI + "/user/" + id + "?adminId=" + Prefs.getLong(Constants.SPUD_ADMIN_ID, -1) + "";
     }
 
     public static String getURLtoSendComment() {
         return Constants.BASE_URI + "/comment";
+    }
+
+    public static String getURLtoUpvote() {
+        return Constants.BASE_URI + "/upvote";
+    }
+
+    public static String getURLtoFetchUpvotedComplaints() {
+        return Constants.BASE_URI + "/upvote?userId=" + ReportItApplication.getCirsUser().getId();
     }
 }

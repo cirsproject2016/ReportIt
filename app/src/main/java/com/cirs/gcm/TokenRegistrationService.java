@@ -2,14 +2,13 @@ package com.cirs.gcm;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.cirs.R;
 import com.cirs.reportit.ReportItApplication;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import static com.cirs.gcm.GcmUtils.SENT_TOKEN_TO_SERVER;
 import static com.cirs.gcm.GcmUtils.sendRegistrationToServer;
@@ -26,7 +25,6 @@ public class TokenRegistrationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         try {
             // [START register_for_gcm]
@@ -44,13 +42,13 @@ public class TokenRegistrationService extends IntentService {
             // You should store a boolean that indicates whether the generated token has been
             // sent to your server. If the boolean is false, send the token to your server,
             // otherwise your server should have already received the token.
-            sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, true).apply();
+            Prefs.putBoolean(SENT_TOKEN_TO_SERVER, true);
             // [END register_for_gcm]
         } catch (Exception e) {
             Log.d(TAG, "Failed to complete token refresh", e);
             // If an exception happens while fetching the new token or updating our registration data
             // on a third-party server, this ensures that we'll attempt the update at a later time.
-            sharedPreferences.edit().putBoolean(SENT_TOKEN_TO_SERVER, false).apply();
+            Prefs.putBoolean(SENT_TOKEN_TO_SERVER, false);
         }
         // Notify UI that registration has completed, so the progress indicator can be hidden.
 /*
