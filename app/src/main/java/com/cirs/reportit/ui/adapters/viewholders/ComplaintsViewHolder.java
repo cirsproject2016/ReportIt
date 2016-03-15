@@ -8,15 +8,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.cirs.R;
 import com.cirs.entities.Complaint;
+import com.cirs.entities.Upvote;
+import com.cirs.reportit.ReportItApplication;
+import com.cirs.reportit.db.dbhelpers.QueryHelper;
 import com.cirs.reportit.ui.activities.ViewCommentsActivity;
 import com.cirs.reportit.ui.activities.ViewComplaintActivity;
+import com.cirs.reportit.ui.adapters.ComplaintsAdapter;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyImageRequest;
+import com.cirs.reportit.utils.VolleyRequest;
+
+import java.util.List;
 
 public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -34,7 +45,9 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
 
     private Context context;
 
-    public ComplaintsViewHolder(View itemView) {
+    private ComplaintsAdapter adapter;
+
+    public ComplaintsViewHolder(View itemView, ComplaintsAdapter adapter) {
         super(itemView);
         this.cardView = (CardView) itemView;
         this.cardView.setOnClickListener(this);
@@ -48,6 +61,8 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
         this.imgbtnBookmark = (ImageButton) itemView.findViewById(R.id.imgbtn_bookmark);
         this.btnComment.setOnClickListener(this);
         this.btnUpvote.setOnClickListener(this);
+        this.imgbtnBookmark.setOnClickListener(this);
+        this.adapter = adapter;
     }
 
     public void setFields(Complaint complaint, Context context) {
@@ -58,9 +73,18 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
         this.txtTimeStamp.setText(complaint.getTimestamp().toString());
         setStatus(complaint.getStatus());
         this.btnUpvote.setText(complaint.getUpvotes() + "");
-        this.btnComment.setText(complaint.getCommentsCount() + "");
-        if (complaint.isBookmarked()) {
-            this.imgbtnBookmark.setImageResource(R.drawable.ic_action_bookmark_on);
+        this.btnComment.setText(complaint.getCommentCount() + "");
+        if (complaint.isBookmarked() || new QueryHelper(context).isBookmarked(complaint)) {
+            this.imgbtnBookmark.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_bookmark_on));
+        } else {
+            this.imgbtnBookmark.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_bookmark_off));
+        }
+        if (ReportItApplication.checkIfComplaintIsUpvoted(complaint.getId())) {
+            this.btnUpvote.setCompoundDrawablesWithIntrinsicBounds(context.getResources()
+                    .getDrawable(R.drawable.ic_action_upvote_on), null, null, null);
+        } else {
+            this.btnUpvote.setCompoundDrawablesWithIntrinsicBounds(context.getResources()
+                    .getDrawable(R.drawable.ic_action_upvote_off), null, null, null);
         }
 
         String URL = Generator.getURLtoGetComplaintImage(complaint.getId());
@@ -80,7 +104,53 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
             Intent intent = new Intent(context, ViewCommentsActivity.class);
             intent.putExtra("complaintId", complaint.getId());
             context.startActivity(intent);
+        } else if (view.getId() == R.id.imgbtn_bookmark) {
+            if (complaint.isBookmarked() || new QueryHelper(context).isBookmarked(complaint)) {
+                Toast.makeText(context, "You unbookmarked this complaint", Toast.LENGTH_SHORT).show();
+                imgbtnBookmark.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_bookmark_off));
+                complaint.setBookmarked(false);
+                new QueryHelper(context).insertOrUpdateComplaint(complaint);
+            } else {
+                Toast.makeText(context, "You bookmarked this complaint", Toast.LENGTH_SHORT).show();
+                imgbtnBookmark.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_bookmark_on));
+                complaint.setBookmarked(true);
+                new QueryHelper(context).insertOrUpdateComplaint(complaint);
+            }
+        } else if (view.getId() == R.id.btn_upvote &&
+                !ReportItApplication.checkIfComplaintIsUpvoted(complaint.getId())) {
+            Upvote upvote = new Upvote();
+            upvote.setUser(complaint.getUser());
+            upvote.setComplaint(complaint);
+            new VolleyRequest<UpvoteResponse>(context).makeGsonRequest(
+                    Request.Method.PUT,
+                    Generator.getURLtoUpvote(),
+                    new Upvote[]{upvote},
+                    new Response.Listener<UpvoteResponse>() {
+                        @Override
+                        public void onResponse(UpvoteResponse response) {
+                            ReportItApplication.addIdToUpvotedSet(complaint.getId());
+                            Toast.makeText(context, "You upvoted this complaint", Toast.LENGTH_SHORT).show();
+                            btnUpvote.setCompoundDrawablesWithIntrinsicBounds(context.getResources()
+                                    .getDrawable(R.drawable.ic_action_upvote_on), null, null, null);
+                            complaint.setUpvoted(true);
+                            new QueryHelper(context).insertOrUpdateComplaint(complaint);
+                            adapter.notifyDataSetChanged();
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                            Toast.makeText(context, "This complaint could not be upvoted", Toast.LENGTH_SHORT).show();
+                        }
+                    },
+                    UpvoteResponse.class);
         }
+    }
+
+    private static class UpvoteResponse {
+        private int created;
+        private List<Upvote> failures;
     }
 
     private void setStatus(String status) {

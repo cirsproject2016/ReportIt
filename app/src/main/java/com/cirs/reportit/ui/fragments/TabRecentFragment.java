@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import java.util.Arrays;
 
 public class TabRecentFragment extends Fragment {
 
+    private static final String TAG = TabRecentFragment.class.getSimpleName();
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private RecyclerView recyclerView;
@@ -62,7 +64,7 @@ public class TabRecentFragment extends Fragment {
                         Arrays.sort(response);
                         complaints = response;
                         recyclerView.setAdapter(new ComplaintsAdapter(complaints, getActivity()));
-                        System.out.println(complaints);
+                        Log.i(TAG, Arrays.toString(complaints));
                         progressDialog.dismiss();
                     }
                 },
@@ -104,6 +106,4 @@ public class TabRecentFragment extends Fragment {
         });
         return view;
     }
-
-
 }

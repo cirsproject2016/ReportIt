@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -69,7 +68,7 @@ public class ViewCommentsActivity extends AppCompatActivity {
                     public void onResponse(Complaint response) {
                         progressDialog.dismiss();
                         complaint = response;
-                        comments = complaint.getComments();
+                        comments = complaint.getComments().toArray(new Comment[]{});
                         Arrays.sort(comments);
                         initializeViews();
                         setListeners();
@@ -164,7 +163,7 @@ public class ViewCommentsActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(Complaint response) {
                                 complaint = response;
-                                comments = complaint.getComments();
+                                comments = complaint.getComments().toArray(new Comment[]{});
                                 Arrays.sort(comments);
                                 swipeRefreshLayout.setRefreshing(false);
                             }

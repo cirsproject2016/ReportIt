@@ -1,6 +1,7 @@
 package com.cirs.entities;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 
 public class Complaint implements Comparable<Complaint> {
@@ -29,9 +30,11 @@ public class Complaint implements Comparable<Complaint> {
 
     private boolean bookmarked;
 
-    private Comment[] comments;
+    private ArrayList<Comment> comments;
 
     private boolean upvoted;
+
+    private int commentCount;
 
     public Integer getUpvotes() {
         return upvotes;
@@ -129,16 +132,12 @@ public class Complaint implements Comparable<Complaint> {
         this.bookmarked = bookmarked;
     }
 
-    public Comment[] getComments() {
+    public ArrayList<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(Comment[] comments) {
+    public void setComments(ArrayList<Comment> comments) {
         this.comments = comments;
-    }
-
-    public int getCommentsCount() {
-        return comments.length;
     }
 
     public boolean isUpvoted() {
@@ -149,8 +148,47 @@ public class Complaint implements Comparable<Complaint> {
         this.upvoted = upvoted;
     }
 
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    @Override
+    public String toString() {
+        return "Complaint{" +
+                "bookmarked=" + bookmarked +
+                ", id=" + id +
+                ", title='" + title + '\'' +
+                ", user=" + user +
+                ", timestamp=" + timestamp +
+                ", status='" + status + '\'' +
+                ", upvotes=" + upvotes +
+                ", upvoted=" + upvoted +
+                ", commentCount=" + commentCount +
+                '}';
+    }
+
     @Override
     public int compareTo(Complaint complaint) {
         return complaint.timestamp.compareTo(this.timestamp);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Complaint complaint = (Complaint) o;
+
+        return id.equals(complaint.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

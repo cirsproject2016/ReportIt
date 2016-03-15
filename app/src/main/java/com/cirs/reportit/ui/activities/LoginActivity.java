@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -23,6 +22,7 @@ import com.cirs.reportit.utils.ErrorUtils;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.SecUtils;
 import com.cirs.reportit.utils.VolleyRequest;
+import com.pixplicity.easyprefs.library.Prefs;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -31,10 +31,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtPassword;
 
     private Button btnLogin;
-
-    private SharedPreferences pref;
-
-    private SharedPreferences.Editor editor;
 
     private Context mActivityContext = this;
 
@@ -50,11 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         initializeViews();
-
-        pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
-
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,11 +67,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void saveToSharedPref() {
-        editor = pref.edit();
-        editor.putLong(Constants.SPUD_ADMIN_ID, adminId);
-        editor.putString(Constants.SPUD_USERNAME, username);
-        editor.putBoolean(Constants.SPUD_IS_SIGNED_IN, true);
-        editor.commit();
+        Prefs.putLong(Constants.SPUD_ADMIN_ID, adminId);
+        Prefs.putString(Constants.SPUD_USERNAME, username);
+        Prefs.putBoolean(Constants.SPUD_IS_SIGNED_IN, true);
     }
 
     private void validateCredentials() {
@@ -90,11 +80,11 @@ public class LoginActivity extends AppCompatActivity {
         obj.userName = username;
         obj.password = password;
         //Show error message if not connected, and return without making a request
-		if(!ErrorUtils.isConnected(this)){
-			new AlertDialog.Builder(this).setMessage("Go online to login").setPositiveButton("OK",null).create().show();
-			progressDialog.dismiss();
-			return;
-		}
+        if (!ErrorUtils.isConnected(this)) {
+            new AlertDialog.Builder(this).setMessage("Go online to login").setPositiveButton("OK", null).create().show();
+            progressDialog.dismiss();
+            return;
+        }
         new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
                 Request.Method.POST,
                 Generator.getURLtoLoginUser(),
@@ -106,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                         ReportItApplication.setCirsUser(response);
                         saveToSharedPref();
                         Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                        if (!pref.getBoolean(Constants.SPUD_IS_PROFILE_CREATED, false)) {
+                        if (!Prefs.getBoolean(Constants.SPUD_IS_PROFILE_CREATED, false)) {
                             startActivity(new Intent(LoginActivity.this, CreateProfileActivity.class));
                         } else {
                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));

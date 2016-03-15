@@ -25,6 +25,9 @@ public final class Constants {
     public static final String SPUD_DOB = "dob";
     public static final String SPUD_EMAIL = "email";
     public static final String SPUD_PHONE = "phone";
+    //String Set Pref
+    public static final String SPUD_UPVOTED_COMPLAINTS = "upvotedUserComplaints";
+    public static final String SPUD_BOOKMARKED_COMPLAINTS = "bookmarkedUserComplaints";
 
     //Splash Screen Activity Constants
     public static final int SPLASH_SCREEN_TIMEOUT = 3000;

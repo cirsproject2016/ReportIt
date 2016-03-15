@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -30,6 +29,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.cirs.R;
 import com.cirs.entities.CIRSUser;
 import com.cirs.reportit.ReportItApplication;
+import com.cirs.reportit.db.dbhelpers.QueryHelper;
 import com.cirs.reportit.utils.CircularNetworkImageView;
 import com.cirs.reportit.utils.Constants;
 import com.cirs.reportit.utils.ErrorUtils;
@@ -41,6 +41,7 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.*;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -76,8 +77,6 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
     @NotEmpty
     private EditText edtGender;
 
-    private ArrayAdapter<String> spinnerAdapter;
-
     private Validator validator;
 
     private Context mActivityContext = this;
@@ -94,10 +93,6 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
 
     private DatePickerDialog datePickerDialog;
 
-    private SharedPreferences pref;
-
-    private SharedPreferences.Editor editor;
-
     private boolean isImageSet = false;
 
     private AlertDialog.Builder gendersDialog;
@@ -112,13 +107,11 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
         setContentView(R.layout.activity_create_profile);
 
         validator = new Validator(mActivityContext);
-        pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
 
         initializeViews();
         setDatePicker();
         setListeners();
         createGendersDialog();
-        //setAndSaveImage(BitmapFactory.decodeResource(getResources(), R.drawable.ic_my_profile));
     }
 
     @Override
@@ -131,10 +124,7 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_submit:
-                //UNCOMMENT LINE BELOW
                 validator.validate();
-                //DELETE LINE BELOW
-//                onValidationSucceeded();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -176,6 +166,7 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
                                 new Response.Listener<Integer>() {
                                     @Override
                                     public void onResponse(Integer response) {
+                                        new QueryHelper(mActivityContext).insertOrUpdateCirsUser(user);
                                         saveToSharedPref();
                                         progressDialog.dismiss();
                                         Toast.makeText(mActivityContext, "Profile created", Toast.LENGTH_SHORT).show();
@@ -201,8 +192,8 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
                         error.printStackTrace();
-                        String message=ErrorUtils.parseVolleyError(error);  //In case of existing email
-						Toast.makeText(mActivityContext, message, Toast.LENGTH_LONG).show();
+                        String message = ErrorUtils.parseVolleyError(error);  //In case of existing email
+                        Toast.makeText(mActivityContext, message, Toast.LENGTH_LONG).show();
                     }
                 },
                 CIRSUser.class
@@ -412,16 +403,14 @@ public class CreateProfileActivity extends AppCompatActivity implements Validato
     }
 
     private void saveToSharedPref() {
-        editor = pref.edit();
-        editor.putString(Constants.SPUD_FIRSTNAME, edtFirstname.getText().toString().trim());
-        editor.putString(Constants.SPUD_LASTNAME, edtLastname.getText().toString().trim());
-        editor.putString(Constants.SPUD_GENDER, edtGender.getText().toString().trim());
-        editor.putString(Constants.SPUD_DOB, edtDOB.getText().toString().trim());
-        editor.putString(Constants.SPUD_EMAIL, edtEmail.getText().toString().trim());
-        editor.putString(Constants.SPUD_PHONE, edtPhone.getText().toString().trim());
-        editor.putBoolean(Constants.SPUD_IS_IMAGE_SET, isImageSet);
-        editor.putBoolean(Constants.SPUD_IS_PROFILE_CREATED, true);
-        editor.commit();
+        Prefs.putString(Constants.SPUD_FIRSTNAME, edtFirstname.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_LASTNAME, edtLastname.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_GENDER, edtGender.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_DOB, edtDOB.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_EMAIL, edtEmail.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_PHONE, edtPhone.getText().toString().trim());
+        Prefs.putBoolean(Constants.SPUD_IS_IMAGE_SET, isImageSet);
+        Prefs.putBoolean(Constants.SPUD_IS_PROFILE_CREATED, true);
     }
 
     private void cropCapturedImage(Uri picUri) {

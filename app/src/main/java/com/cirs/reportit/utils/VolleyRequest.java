@@ -15,6 +15,8 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -39,8 +41,9 @@ import java.util.concurrent.Executors;
 public class VolleyRequest<T> {
     private static RequestQueue queue;
     private static Context context;
+
     public VolleyRequest(Context context) {
-        this.context=context;
+        this.context = context;
         if (queue == null) {
             queue = Volley.newRequestQueue(context);
         }
@@ -119,54 +122,23 @@ public class VolleyRequest<T> {
         ex.shutdown();
     }
 
-    /*public void makeImageGetRequest(final String url, final Listener<byte[]> listener, final ErrorListener errorListener) {
-        final Handler handler = new Handler();
-        Runnable download = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final HttpURLConnection conn = (HttpURLConnection) new URL("http://10.0.3.2:8080/CIRSWeb/image/users/3").openConnection();
-                    conn.setRequestMethod("GET");
-                    InputStream is= conn.getInputStream();
-                    List<String> lengthList= conn.getHeaderFields().get("Content-Length");
-                    int length=1024*1024*1024;
-                    if(!lengthList.isEmpty()){
-                        length=Integer.parseInt(lengthList.get(0));
-                    }
-                    final byte[] buff=new byte[length];
-                    while(is.read(buff)!=-1);
-                    System.out.println(Arrays.toString(buff));
-                    final NetworkResponse resp = new NetworkResponse(conn.getResponseCode(), buff, null, true);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            System.out.println(resp.statusCode);
-                            if (resp.statusCode >= 200 && resp.statusCode < 300) {
-                                listener.onResponse(buff);
-                            } else {
-
-                                VolleyError error = new VolleyError(resp);
-                                errorListener.onErrorResponse(error);
-                            }
-                        }
-                    });
-                } catch (IOException e ){
-                    e.printStackTrace();
-                }
-            }
-        };
-        ExecutorService ex = Executors.newSingleThreadExecutor();
-        ex.execute(download);
-        ex.shutdown();
-    }*/
-
     private static class GsonRequest<T> extends JsonRequest<T> {
 
         private static Gson gson = getGson();
         private Listener<T> listener;
 
         private static Gson getGson() {
-            return new GsonBuilder().setDateFormat("dd MMM yyyy HH:mm:ss").create();
+            return new GsonBuilder().setDateFormat("dd MMM yyyy HH:mm:ss").addSerializationExclusionStrategy(new ExclusionStrategy() {
+                @Override
+                public boolean shouldSkipField(FieldAttributes f) {
+                    return f.getName().equalsIgnoreCase("upvotes") || f.getName().equalsIgnoreCase("upvoted");
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> clazz) {
+                    return false;
+                }
+            }).setPrettyPrinting().create();
         }
 
         private Class<T> clazz;
@@ -174,7 +146,8 @@ public class VolleyRequest<T> {
         public GsonRequest(Class<T> clazz, int method, String url, Object requestBody, Listener<T> listener, ErrorListener errorListener) {
             super(method, url, gson.toJson(requestBody), listener, errorListener);
             String s = gson.toJson(requestBody);
-			Log.d("VolleyRequest",s);
+            Log.d("VolleyRequest", "request Body" + s);
+            Log.d("VolleyRequest", "request url" + url);
             this.clazz = clazz;
             this.listener = listener;
         }

@@ -103,7 +103,7 @@
                     android:layout_weight="1"
                     android:background="@android:color/white"
                     android:drawableLeft="@drawable/ic_action_upvote_off"
-                    android:paddingLeft="3dp" />
+                    android:paddingLeft="5dp" />
 
                 <View
                     android:layout_width="1dp"
@@ -117,7 +117,7 @@
                     android:layout_weight="1"
                     android:background="@android:color/white"
                     android:drawableLeft="@drawable/ic_action_comment"
-                    android:paddingLeft="3dp" />
+                    android:paddingLeft="5dp" />
 
                 <View
                     android:layout_width="1dp"

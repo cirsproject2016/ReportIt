@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -34,6 +33,7 @@ import com.android.volley.VolleyError;
 import com.cirs.R;
 import com.cirs.entities.CIRSUser;
 import com.cirs.reportit.ReportItApplication;
+import com.cirs.reportit.db.dbhelpers.QueryHelper;
 import com.cirs.reportit.utils.Constants;
 import com.cirs.reportit.utils.ErrorUtils;
 import com.cirs.reportit.utils.Generator;
@@ -45,6 +45,7 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Pattern;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -112,10 +113,6 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     private DatePickerDialog datePickerDialog;
 
-    private SharedPreferences pref;
-
-    private SharedPreferences.Editor editor;
-
     private boolean isImageSet;
 
     private AlertDialog.Builder gendersDialog;
@@ -125,9 +122,9 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
     private Bitmap bitmapProfilePic;
 
     private TextInputLayout tilPhone;
-	
-	private static final String TAG=ViewProfileActivity.class.getSimpleName();
-	
+
+    private static final String TAG = ViewProfileActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,7 +135,6 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
         initializeViews();
         validator = new Validator(mActivityContext);
-        pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
         linearLayout.requestFocus();
         views = new ArrayList<>(Arrays.asList(edtFirstname, edtLastname, edtGender, edtDOB, edtEmail, edtPhone));
 
@@ -164,10 +160,10 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
                 menuItem = item;
                 if (!inEditMode) {
                     //Don't allow user to edit if offline.
-					if(!ErrorUtils.isConnected(ViewProfileActivity.this)){
-						new AlertDialog.Builder(ViewProfileActivity.this).setMessage("Cannot edit offline").setPositiveButton("OK",null).create().show();
-						return true;
-					}
+                    if (!ErrorUtils.isConnected(ViewProfileActivity.this)) {
+                        new AlertDialog.Builder(ViewProfileActivity.this).setMessage("Cannot edit offline").setPositiveButton("OK", null).create().show();
+                        return true;
+                    }
                     inEditMode = true;
                     if (isImageSet) {
                         txtRemove.setVisibility(View.VISIBLE);
@@ -241,10 +237,9 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
             );
         }
         if (hasAnyValueChanged()) {
-            //saveToSharedPref();
             //retrieve value from fields
             final CIRSUser user = createUserFromFields();
-			final ProgressDialog dialog=ProgressDialog.show(ViewProfileActivity.this, null, "Changing Details", true, false);
+            final ProgressDialog dialog = ProgressDialog.show(ViewProfileActivity.this, null, "Changing Details", true, false);
             //make request
             new VolleyRequest<CIRSUser>(mActivityContext).makeGsonRequest(
                     Request.Method.PUT,
@@ -254,29 +249,30 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
                         @Override
                         public void onResponse(CIRSUser response) {
                             //if OK, save, and end editing
-							saveToSharedPref();
-							inEditMode = false;
-							actionBar.setDisplayHomeAsUpEnabled(true);
-							actionBar.setTitle(getResources().getString(R.string.title_activity_view_profile));
-							toggleViews(views, false);
-							txtRemove.setVisibility(View.GONE);
-							floatingActionMenu.setVisibility(View.GONE);
-							menuItem.setIcon(R.drawable.ic_edit);
-							menuItem.setTitle(getResources().getString(R.string.view_profile_menu_item_title_edit));
-							hideKeyboard();
-							dialog.dismiss();
+                            saveToSharedPref();
+                            new QueryHelper(mActivityContext).insertOrUpdateCirsUser(user);
+                            inEditMode = false;
+                            actionBar.setDisplayHomeAsUpEnabled(true);
+                            actionBar.setTitle(getResources().getString(R.string.title_activity_view_profile));
+                            toggleViews(views, false);
+                            txtRemove.setVisibility(View.GONE);
+                            floatingActionMenu.setVisibility(View.GONE);
+                            menuItem.setIcon(R.drawable.ic_edit);
+                            menuItem.setTitle(getResources().getString(R.string.view_profile_menu_item_title_edit));
+                            hideKeyboard();
+                            dialog.dismiss();
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             //if not, reset value of email text, show error and remain in edit mode.
-							error.printStackTrace();
-							Log.d(TAG,"in on error response");
-							String message=ErrorUtils.parseVolleyError(error);
-							new AlertDialog.Builder(ViewProfileActivity.this).setMessage(message).setPositiveButton("OK",null).create().show();
-							dialog.dismiss();					
-							Log.i(TAG,"reverting to previous email" + ReportItApplication.getCirsUser().getEmail());
+                            error.printStackTrace();
+                            Log.d(TAG, "in on error response");
+                            String message = ErrorUtils.parseVolleyError(error);
+                            new AlertDialog.Builder(ViewProfileActivity.this).setMessage(message).setPositiveButton("OK", null).create().show();
+                            dialog.dismiss();
+                            Log.i(TAG, "reverting to previous email" + ReportItApplication.getCirsUser().getEmail());
                             edtEmail.setText(ReportItApplication.getCirsUser().getEmail());
                         }
                     },
@@ -286,19 +282,19 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
 
     }
 
-	
-	private CIRSUser createUserFromFields(){
-		CIRSUser user=new CIRSUser();
-		user.setId(ReportItApplication.getCirsUser().getId());
-		user.setFirstName(edtFirstname.getText().toString());
-		user.setLastName(edtLastname.getText().toString());
-		user.setGender(edtGender.getText().toString());
-		user.setDob(edtDOB.getText().toString());
-		user.setEmail(edtEmail.getText().toString());
-		user.setPhone(edtPhone.getText().toString());
-		return user;
-	}
-	
+
+    private CIRSUser createUserFromFields() {
+        CIRSUser user = new CIRSUser();
+        user.setId(ReportItApplication.getCirsUser().getId());
+        user.setFirstName(edtFirstname.getText().toString());
+        user.setLastName(edtLastname.getText().toString());
+        user.setGender(edtGender.getText().toString());
+        user.setDob(edtDOB.getText().toString());
+        user.setEmail(edtEmail.getText().toString());
+        user.setPhone(edtPhone.getText().toString());
+        return user;
+    }
+
     @Override
     public void onValidationFailed(List<ValidationError> errors) {
         for (ValidationError error : errors) {
@@ -484,14 +480,14 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
     }
 
     private void initializeFields() {
-        edtUsername.setText(pref.getString(Constants.SPUD_USERNAME, null));
-        edtFirstname.setText(pref.getString(Constants.SPUD_FIRSTNAME, null));
-        edtLastname.setText(pref.getString(Constants.SPUD_LASTNAME, null));
-        edtDOB.setText(pref.getString(Constants.SPUD_DOB, null));
-        edtEmail.setText(pref.getString(Constants.SPUD_EMAIL, null));
-        edtPhone.setText(pref.getString(Constants.SPUD_PHONE, null));
-        edtGender.setText(pref.getString(Constants.SPUD_GENDER, null));
-        isImageSet = pref.getBoolean(Constants.SPUD_IS_IMAGE_SET, false);
+        edtUsername.setText(Prefs.getString(Constants.SPUD_USERNAME, null));
+        edtFirstname.setText(Prefs.getString(Constants.SPUD_FIRSTNAME, null));
+        edtLastname.setText(Prefs.getString(Constants.SPUD_LASTNAME, null));
+        edtDOB.setText(Prefs.getString(Constants.SPUD_DOB, null));
+        edtEmail.setText(Prefs.getString(Constants.SPUD_EMAIL, null));
+        edtPhone.setText(Prefs.getString(Constants.SPUD_PHONE, null));
+        edtGender.setText(Prefs.getString(Constants.SPUD_GENDER, null));
+        isImageSet = Prefs.getBoolean(Constants.SPUD_IS_IMAGE_SET, false);
         if (isImageSet) {
             setProfilePic();
         } else {
@@ -518,15 +514,13 @@ public class ViewProfileActivity extends AppCompatActivity implements Validator.
     }
 
     private void saveToSharedPref() {
-        editor = pref.edit();
-        editor.putString(Constants.SPUD_FIRSTNAME, edtFirstname.getText().toString().trim());
-        editor.putString(Constants.SPUD_LASTNAME, edtLastname.getText().toString().trim());
-        editor.putString(Constants.SPUD_GENDER, edtGender.getText().toString().trim());
-        editor.putString(Constants.SPUD_DOB, edtDOB.getText().toString().trim());
-        editor.putString(Constants.SPUD_EMAIL, edtEmail.getText().toString().trim());
-        editor.putString(Constants.SPUD_PHONE, edtPhone.getText().toString().trim());
-        editor.putBoolean(Constants.SPUD_IS_IMAGE_SET, isImageSet);
-        editor.commit();
+        Prefs.putString(Constants.SPUD_FIRSTNAME, edtFirstname.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_LASTNAME, edtLastname.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_GENDER, edtGender.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_DOB, edtDOB.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_EMAIL, edtEmail.getText().toString().trim());
+        Prefs.putString(Constants.SPUD_PHONE, edtPhone.getText().toString().trim());
+        Prefs.putBoolean(Constants.SPUD_IS_IMAGE_SET, isImageSet);
     }
 
     private void cropCapturedImage(Uri picUri) {

@@ -12,9 +12,6 @@ import com.cirs.reportit.ui.adapters.viewholders.UserComplaintsViewHolder;
 
 import java.util.ArrayList;
 
-/**
- * Created by Kshitij on 06-03-2016.
- */
 public class UserComplaintsAdapter extends RecyclerView.Adapter<UserComplaintsViewHolder> {
 
     private ArrayList<Complaint> complaints;

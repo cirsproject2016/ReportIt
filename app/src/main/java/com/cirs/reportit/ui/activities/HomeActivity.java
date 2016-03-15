@@ -2,7 +2,6 @@ package com.cirs.reportit.ui.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -29,6 +28,7 @@ import com.cirs.reportit.ui.fragments.TabMyReportsFragment;
 import com.cirs.reportit.ui.fragments.TabRecentFragment;
 import com.cirs.reportit.utils.Constants;
 import com.github.clans.fab.FloatingActionButton;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import java.io.FileInputStream;
 
@@ -57,18 +57,12 @@ public class HomeActivity extends AppCompatActivity
 
     private Context context = this;
 
-    private SharedPreferences pref;
-
-    private SharedPreferences.Editor editor;
-
     private FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_USER_DETAILS, 0);
-        editor = pref.edit();
         initializeViews();
         setListeners();
         setProfilePicAndUsername();
@@ -79,6 +73,7 @@ public class HomeActivity extends AppCompatActivity
         toggle.syncState();
 
         ReportItApplication.fetchCategories();
+        ReportItApplication.fetchUpvotedComplaintsByThisUser();
 
         if (GcmUtils.checkPlayServices(this)) {
             Intent intent = new Intent(this, TokenRegistrationService.class);
@@ -93,7 +88,7 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+
         int id = item.getItemId();
 
         switch (id) {
@@ -121,14 +116,11 @@ public class HomeActivity extends AppCompatActivity
 
             case R.id.nav_logout:
                 GcmUtils.invalidateToken(this);
-                editor.clear();
-                editor.commit();
+                Prefs.clear();
                 Toast.makeText(context, "Successfully logged out!", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(HomeActivity.this, LoginActivity.class));
                 finish();
                 break;
-
-
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -151,7 +143,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void setProfilePicAndUsername() {
-        if (pref.getBoolean(Constants.SPUD_IS_IMAGE_SET, false)) {
+        if (Prefs.getBoolean(Constants.SPUD_IS_IMAGE_SET, false)) {
             try {
                 FileInputStream fis = context.openFileInput(Constants.FILE_PATH_PROFILE_PIC);
                 Bitmap b = BitmapFactory.decodeStream(fis);
@@ -160,7 +152,7 @@ public class HomeActivity extends AppCompatActivity
             } catch (Exception e) {
             }
         }
-        txtUsername.setText(pref.getString(Constants.SPUD_FIRSTNAME, null) + " " + pref.getString(Constants.SPUD_LASTNAME, null));
+        txtUsername.setText(Prefs.getString(Constants.SPUD_FIRSTNAME, null) + " " + Prefs.getString(Constants.SPUD_LASTNAME, null));
     }
 
     private void initializeViews() {
