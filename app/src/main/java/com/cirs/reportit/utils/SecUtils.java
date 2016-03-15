@@ -17,10 +17,16 @@ public class SecUtils {
             SHA = MessageDigest.getInstance("SHA-512");
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            throw new AssertionError("SECUTILS: sha-512 must exist");
+            throw new AssertionError("SecUtils: sha-512 must exist");
         }
     }
 
+    /**
+     * Creates a hash (length 128) of the given plaintext
+     *
+     * @param plainText the string whose hash is to be calculated
+     * @return the hash
+     */
     public static String hash(String plainText) {
         byte[] hashBytes = SHA.digest(plainText.getBytes());
         StringBuilder sb = new StringBuilder();
