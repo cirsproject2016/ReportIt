@@ -6,11 +6,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,12 +24,15 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.android.volley.NoConnectionError;
 import com.cirs.R;
 import com.cirs.entities.CIRSUser;
 import com.cirs.entities.Category;
 import com.cirs.entities.Complaint;
 import com.cirs.reportit.ReportItApplication;
+import com.cirs.reportit.offline.OfflineManager;
 import com.cirs.reportit.utils.Constants;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyRequest;
@@ -49,6 +53,7 @@ import java.util.List;
 
 public class NewComplaintActivity extends AppCompatActivity implements Validator.ValidationListener {
 
+    private static final String TAG = NewComplaintActivity.class.getSimpleName();
     private LinearLayout linearLayout;
 
     @NotEmpty
@@ -269,7 +274,7 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
     @Override
     public void onValidationSucceeded() {
         progressDialog.show();
-        Complaint complaint = new Complaint();
+        final Complaint complaint = new Complaint();
         complaint.setCategory(selectedcategory);
         complaint.setTitle(edtTitle.getText().toString());
         complaint.setDescription(edtDescription.getText().toString());
@@ -321,6 +326,12 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
                         error.printStackTrace();
+                        if (error instanceof NoConnectionError || error instanceof TimeoutError) {
+                            Log.i(TAG, "enqueuing complaint " + complaint);
+                            //Add complaint to offline requests
+                            OfflineManager.getInstance(NewComplaintActivity.this).enqueueComplaintRequest(complaint);
+                            return;
+                        }
                         Toast.makeText(mActivityContext, "There was an error. Please try again.", Toast.LENGTH_SHORT).show();
                     }
                 },
