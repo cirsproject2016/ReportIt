@@ -20,6 +20,7 @@ import com.cirs.reportit.ReportItApplication;
 import com.cirs.reportit.utils.Constants;
 import com.cirs.reportit.utils.ErrorUtils;
 import com.cirs.reportit.utils.Generator;
+import com.cirs.reportit.utils.SecUtils;
 import com.cirs.reportit.utils.VolleyRequest;
 import com.pixplicity.easyprefs.library.Prefs;
 
@@ -74,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
     private void validateCredentials() {
         progressDialog.show();
         username = edtUsername.getText().toString().trim();
-        password = edtPassword.getText().toString().trim();
+        password = SecUtils.hash(edtPassword.getText().toString().trim());  //hash the password input
         UserCred obj = new UserCred();
         obj.userName = username;
         obj.password = password;
