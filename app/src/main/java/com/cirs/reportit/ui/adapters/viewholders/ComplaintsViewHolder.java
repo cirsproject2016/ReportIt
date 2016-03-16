@@ -90,7 +90,7 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
         String URL = Generator.getURLtoGetComplaintImage(complaint.getId());
         ImageLoader imageLoader = VolleyImageRequest.getInstance(context).getImageLoader();
         imageLoader.get(URL, ImageLoader.getImageListener(
-                this.imgComplaint, android.R.drawable.ic_menu_gallery, android.R.drawable.ic_dialog_alert));
+                this.imgComplaint, R.mipmap.ic_loading, R.mipmap.ic_no_connection));
         imgComplaint.setImageUrl(URL, imageLoader);
     }
 
