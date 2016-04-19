@@ -173,7 +173,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
         String URL = Generator.getURLtoGetComplaintImage(complaint.getId());
         ImageLoader imageLoader = VolleyImageRequest.getInstance(mActivityContext).getImageLoader();
         imageLoader.get(URL, ImageLoader.getImageListener(
-                this.imgComplaint, android.R.drawable.ic_menu_gallery, android.R.drawable.ic_dialog_alert));
+                this.imgComplaint, R.mipmap.ic_loading, R.mipmap.ic_no_connection));
         imgComplaint.setImageUrl(URL, imageLoader);
 
         setStatus(complaint.getStatus());
@@ -274,6 +274,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(mActivityContext, ViewCommentsActivity.class);
                 intent.putExtra("complaintId", complaint.getId());
+                intent.putExtra("title", complaint.getTitle());
                 startActivity(intent);
             }
         });

@@ -127,7 +127,7 @@ public class ViewUserActivity extends AppCompatActivity {
         String URL = Generator.getURLtoGetUserImage(userId);
         ImageLoader imageLoader = VolleyImageRequest.getInstance(mActivityContext).getImageLoader();
         imageLoader.get(URL, ImageLoader.getImageListener(
-                imgProfile, R.drawable.ic_my_profile, android.R.drawable.ic_dialog_alert));
+                imgProfile, R.drawable.ic_my_profile, R.mipmap.ic_no_connection));
         imgProfile.setImageUrl(URL, imageLoader);
     }
 

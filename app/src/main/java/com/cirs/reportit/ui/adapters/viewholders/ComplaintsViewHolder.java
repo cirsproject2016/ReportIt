@@ -90,7 +90,7 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
         String URL = Generator.getURLtoGetComplaintImage(complaint.getId());
         ImageLoader imageLoader = VolleyImageRequest.getInstance(context).getImageLoader();
         imageLoader.get(URL, ImageLoader.getImageListener(
-                this.imgComplaint, android.R.drawable.ic_menu_gallery, android.R.drawable.ic_dialog_alert));
+                this.imgComplaint, R.mipmap.ic_loading, R.mipmap.ic_no_connection));
         imgComplaint.setImageUrl(URL, imageLoader);
     }
 
@@ -103,6 +103,7 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
         } else if (view.getId() == R.id.btn_comment) {
             Intent intent = new Intent(context, ViewCommentsActivity.class);
             intent.putExtra("complaintId", complaint.getId());
+            intent.putExtra("title", complaint.getTitle());
             context.startActivity(intent);
         } else if (view.getId() == R.id.imgbtn_bookmark) {
             if (complaint.isBookmarked() || new QueryHelper(context).isBookmarked(complaint)) {
