@@ -43,7 +43,7 @@ public class VolleyRequest<T> {
     private static Context context;
 
     public VolleyRequest(Context context) {
-        this.context = context;
+        VolleyRequest.context = context;
         if (queue == null) {
             queue = Volley.newRequestQueue(context);
         }
@@ -65,9 +65,9 @@ public class VolleyRequest<T> {
         if (url == null || clazz == null) {
             throw new NullPointerException("Url and class cannot be null");
         }
-        Request<T> request = new GsonRequest<T>(clazz, method, url, object, listener, errorListener);
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        Request<T> request = new GsonRequest<>(clazz, method, url, object, listener, errorListener);
+        //request.setRetryPolicy(new DefaultRetryPolicy(
+        //        10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
 
     }
@@ -76,7 +76,7 @@ public class VolleyRequest<T> {
         PNG("image/png"), JPEG("image/jpg"), BMP("image/bmp");
         private String type;
 
-        private FileType(String type) {
+        FileType(String type) {
             this.type = type;
         }
 

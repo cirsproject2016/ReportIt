@@ -12,9 +12,9 @@ import com.android.volley.VolleyError;
 import com.cirs.entities.CIRSUser;
 import com.cirs.entities.Category;
 import com.cirs.entities.Complaint;
-import com.cirs.entities.Upvote;
 import com.cirs.reportit.db.dbhelpers.CirsAppDbHelper;
 import com.cirs.reportit.db.dbhelpers.QueryHelper;
+import com.cirs.reportit.offline.OfflineManager;
 import com.cirs.reportit.utils.Constants;
 import com.cirs.reportit.utils.Generator;
 import com.cirs.reportit.utils.VolleyRequest;
@@ -59,6 +59,10 @@ public class ReportItApplication extends Application {
                 .setPrefsName(getPackageName())
                 .setUseDefaultSharedPreference(true)
                 .build();
+
+        OfflineManager.getInstance(this);
+        //Create an instance of offline manager
+        //So it can listen to network changes
 
         mAppContext = getApplicationContext();
         fetchCategories();
