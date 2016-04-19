@@ -284,7 +284,9 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
         user.setId(ReportItApplication.getCirsUser().getId());
         complaint.setUser(user);
         complaint.setTimestamp(new Timestamp(System.currentTimeMillis()));
-
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmpComplaintPic.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        final byte[] byteArray = stream.toByteArray();
         new VolleyRequest<Complaint>(mActivityContext).makeGsonRequest(
                 Request.Method.PUT,
                 Generator.getURLtoSendComplaint(),
@@ -293,9 +295,7 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
                     @Override
                     public void onResponse(Complaint response) {
 
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        bmpComplaintPic.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        byte[] byteArray = stream.toByteArray();
+
                         new VolleyRequest<byte[]>(mActivityContext).makeImageRequest(
                                 Generator.getUrltoUploadComplaintPic(response),
                                 "put",
@@ -314,6 +314,13 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
                                         progressDialog.dismiss();
+                                        if (error instanceof NoConnectionError) {
+                                            OfflineManager.getInstance(NewComplaintActivity.this).enqueueComplaintImage(complaint, byteArray, VolleyRequest.FileType.PNG);
+                                            isComplaintComplete = true;
+
+                                            finish();
+                                            return;
+                                        }
                                         error.printStackTrace();
                                         Toast.makeText(mActivityContext, "There was an error uploading image", Toast.LENGTH_SHORT).show();
                                     }
@@ -329,7 +336,11 @@ public class NewComplaintActivity extends AppCompatActivity implements Validator
                         if (error instanceof NoConnectionError || error instanceof TimeoutError) {
                             Log.i(TAG, "enqueuing complaint " + complaint);
                             //Add complaint to offline requests
+
+                            complaint.setComplaintPic(byteArray);
                             OfflineManager.getInstance(NewComplaintActivity.this).enqueueComplaintRequest(complaint);
+                            isComplaintComplete = true;
+                            finish();
                             return;
                         }
                         Toast.makeText(mActivityContext, "There was an error. Please try again.", Toast.LENGTH_SHORT).show();

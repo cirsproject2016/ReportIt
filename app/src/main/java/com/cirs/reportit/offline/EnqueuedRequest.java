@@ -7,14 +7,14 @@ public class EnqueuedRequest<T> {
     private int method;
     private String url;
 
-    public EnqueuedRequest(int method, String url, Object requestBody, Class<T> clazz) {
+    public EnqueuedRequest(int method, String url, T requestBody, Class<T> clazz) {
         this.method = method;
         this.url = url;
         this.requestBody = requestBody;
         this.clazz = clazz;
     }
 
-    private Object requestBody;
+    private T requestBody;
     private Class<T> clazz;
 
     public String getUrl() {
@@ -33,11 +33,11 @@ public class EnqueuedRequest<T> {
         this.method = method;
     }
 
-    public Object getRequestBody() {
+    public T getRequestBody() {
         return requestBody;
     }
 
-    public void setRequestBody(Object requestBody) {
+    public void setRequestBody(T requestBody) {
         this.requestBody = requestBody;
     }
 
