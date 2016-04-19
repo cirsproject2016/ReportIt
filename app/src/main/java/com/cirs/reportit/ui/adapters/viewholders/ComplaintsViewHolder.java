@@ -103,6 +103,7 @@ public class ComplaintsViewHolder extends RecyclerView.ViewHolder implements Vie
         } else if (view.getId() == R.id.btn_comment) {
             Intent intent = new Intent(context, ViewCommentsActivity.class);
             intent.putExtra("complaintId", complaint.getId());
+            intent.putExtra("title", complaint.getTitle());
             context.startActivity(intent);
         } else if (view.getId() == R.id.imgbtn_bookmark) {
             if (complaint.isBookmarked() || new QueryHelper(context).isBookmarked(complaint)) {

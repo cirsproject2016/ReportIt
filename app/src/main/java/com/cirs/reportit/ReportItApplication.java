@@ -31,7 +31,7 @@ public class ReportItApplication extends Application {
 
     private static Context mAppContext;
 
-    private static ArrayList<Category> categories = new ArrayList<>();
+    private static Set<Category> categories = new HashSet<>();
 
     private static Set<String> upvotedComplaintsStringIds = new HashSet<>();
 
@@ -92,7 +92,7 @@ public class ReportItApplication extends Application {
         return mAppContext;
     }
 
-    public static ArrayList<Category> getCategories() {
+    public static Set<Category> getCategories() {
         return categories;
     }
 
@@ -110,14 +110,14 @@ public class ReportItApplication extends Application {
                             }
                         }
                         System.out.println(response);
-                        new QueryHelper(mAppContext).insertOrUpdateCategory(categories);
+                        new QueryHelper(mAppContext).insertOrUpdateCategory(new ArrayList<Category>(categories));
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
-                        categories = new ArrayList<>(new QueryHelper(mAppContext).getCategoryList());
+                        categories = new HashSet<>(new QueryHelper(mAppContext).getCategoryList());
                     }
                 },
                 Category[].class);

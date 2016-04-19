@@ -274,6 +274,7 @@ public class ViewComplaintActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(mActivityContext, ViewCommentsActivity.class);
                 intent.putExtra("complaintId", complaint.getId());
+                intent.putExtra("title", complaint.getTitle());
                 startActivity(intent);
             }
         });

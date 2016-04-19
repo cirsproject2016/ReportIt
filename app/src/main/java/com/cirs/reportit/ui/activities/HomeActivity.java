@@ -175,6 +175,7 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(HomeActivity.this, NewComplaintActivity.class));
+                finish();
             }
         });
     }

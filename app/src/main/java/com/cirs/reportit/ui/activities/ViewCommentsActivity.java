@@ -53,6 +53,7 @@ public class ViewCommentsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_comments);
+        getSupportActionBar().setTitle(getIntent().getStringExtra("title"));
         progressDialog = new ProgressDialog(mActivityContext);
         progressDialog.setMessage("Loading");
         progressDialog.setIndeterminate(true);
