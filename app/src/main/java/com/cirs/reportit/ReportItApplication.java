@@ -108,6 +108,7 @@ public class ReportItApplication extends Application {
                 new Response.Listener<Category[]>() {
                     @Override
                     public void onResponse(Category[] response) {
+                        categories=new HashSet<Category>();
                         for (Category category : response) {
                             if (!categories.contains(category)) {
                                 categories.add(category);

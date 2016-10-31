@@ -22,6 +22,7 @@ import com.cirs.R;
 import com.cirs.gcm.GcmUtils;
 import com.cirs.gcm.TokenRegistrationService;
 import com.cirs.reportit.ReportItApplication;
+import com.cirs.reportit.db.dbhelpers.QueryHelper;
 import com.cirs.reportit.ui.adapters.ViewPagerAdapter;
 import com.cirs.reportit.ui.fragments.TabBookmarkedFragment;
 import com.cirs.reportit.ui.fragments.TabMyReportsFragment;
@@ -117,6 +118,7 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_logout:
                 GcmUtils.invalidateToken(this);
                 Prefs.clear();
+                new QueryHelper(this).emptyAllTables();
                 Toast.makeText(context, "Successfully logged out!", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(HomeActivity.this, LoginActivity.class));
                 finish();

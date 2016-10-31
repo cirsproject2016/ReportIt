@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.net.Uri;
 
 import com.cirs.entities.Admin;
 import com.cirs.entities.CIRSUser;
@@ -16,6 +17,7 @@ import com.cirs.reportit.db.dbconstants.CIRSUserConstants;
 import com.cirs.reportit.db.dbconstants.CategoryConstants;
 import com.cirs.reportit.db.dbconstants.CommentConstants;
 import com.cirs.reportit.db.dbconstants.ComplaintConstants;
+import com.cirs.reportit.db.dbconstants.DatabaseConstants;
 import com.cirs.reportit.utils.Constants;
 import com.pixplicity.easyprefs.library.Prefs;
 
@@ -358,5 +360,13 @@ public class QueryHelper {
             complaintList = getBookmarkedComplaints();
         }
         return complaintList.contains(complaint);
+    }
+
+
+    public void emptyAllTables() {
+        Uri[] uris = {ComplaintConstants.TABLE_COMPLAINT_URI, CategoryConstants.TABLE_CATEGORY_URI, CIRSUserConstants.TABLE_CIRSUSER_URI, CommentConstants.TABLE_COMMENT_URI};
+        for (Uri uri : uris) {
+            contentResolver.delete(uri, null, null);
+        }
     }
 }
